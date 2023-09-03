@@ -21,8 +21,9 @@ func ParseMangaList(d *data.MangaList) (*data.MangaList, error) {
 	c := colly.NewCollector()
 
 	// TODO: css selector to search for
-	c.OnHTML("<css selector>", func(e *colly.HTMLElement) {
-		// ...
+	c.OnHTML("div.episode-segment", func(e *colly.HTMLElement) {
+		// TODO: scrape for arc name: ".segment-heading .segment-name"
+		// TODO: scrape for chapters: ".segment-body .segment-row" => ".segment-(number|name|date|pages|lang)"
 	})
 
 	c.OnRequest(func(r *colly.Request) {
