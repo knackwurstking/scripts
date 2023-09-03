@@ -54,9 +54,21 @@ func main() {
 	}
 }
 
-func download(chapter Data.Chapter, path string) {
-	// TODO: ...
+func download(chapter Data.MangaList_Chapter, path string) {
 	log.Printf("[DEBUG] @TODO: download the %d pages to \"%s\"", chapter.Pages, path)
+
+	// TODO: download jpg/png from dURL - scrape the same script section like before
+	chapterData, err := scraper.ParseChapter()
+	if err != nil {
+		log.Printf("[ERROR] %s\n", err)
+		return
+	}
+
+	// TODO: store json data to "<path>/data.json" first
+
+	for i, page := range chapterData.Chapter.Pages {
+		// TODO: download image from `page.Url` and save as ("%02d", i)
+	}
 
 	log.Printf("[DEBUG] @TODO: and convert to \"%s\"", path+".pdf")
 }

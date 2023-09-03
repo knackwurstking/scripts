@@ -1,18 +1,18 @@
 package data
 
-type Special struct {
+type MangaList_Special struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
 
-type Arc struct {
+type MangaList_Arc struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 	Min  int    `json:"min"`
 	Max  int    `json:"max"`
 }
 
-type Chapter struct {
+type MangaList_Chapter struct {
 	Id          int    `json:"id"`
 	Name        string `json:"name"`
 	Number      int    `json:"number"`
@@ -27,12 +27,12 @@ type Chapter struct {
 }
 
 type MangaList struct {
-	Specials []Special `json:"specials"`
-	Arcs     []Arc     `json:"arcs"`
-	Chapters []Chapter `json:"entries"`
+	Specials []MangaList_Special `json:"specials"`
+	Arcs     []MangaList_Arc     `json:"arcs"`
+	Chapters []MangaList_Chapter `json:"entries"`
 }
 
-func (mangaList *MangaList) GetArc(id int) (arc *Arc, index int) {
+func (mangaList *MangaList) GetArc(id int) (arc *MangaList_Arc, index int) {
 	for i := 0; i < len(mangaList.Arcs); i++ {
 		if mangaList.Arcs[i].Id == id {
 			return &mangaList.Arcs[i], i
