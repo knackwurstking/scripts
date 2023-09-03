@@ -10,8 +10,7 @@ import (
 var (
 	MaxChapterDownloadsPerDay int
 	DownloadDelay             int
-
-	Settings *data.Settings
+	DataDownloadDir           string
 )
 
 func init() {
@@ -21,7 +20,12 @@ func init() {
 		return
 	}
 
-	if err := json.NewDecoder(file).Decode(Settings); err != nil {
+	var s *data.Settings = data.NewSettings()
+	if err := json.NewDecoder(file).Decode(s); err != nil {
 		log.Fatalf("[FATAL] %s", err)
 	}
+
+	MaxChapterDownloadsPerDay = s.MaxChapterDownloadsPerDay
+	DownloadDelay = s.DownloadDelay
+	DataDownloadDir = s.DataDownloadDir
 }
