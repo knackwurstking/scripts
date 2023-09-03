@@ -1,5 +1,9 @@
 package main
 
+import (
+	_ "op-manga-dl/internal/settings" // this will load the configuration (settings.json) file
+)
+
 // TODO: ...
 // ... parse manga list for chapters and arcs (cache in data/chapters.json)
 // ... check for missing chapters in data/downloads (or data/chapters.json)
@@ -10,5 +14,4 @@ package main
 // ... mark chapter as complete in "data/chapters.json"
 
 func main() {
-	// ...
 }
