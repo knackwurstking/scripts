@@ -4,17 +4,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	Data "op-manga-dl/internal/data"
 	"op-manga-dl/internal/scraper" // this will load the configuration (settings.json) file
 	"op-manga-dl/internal/settings"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 // TODO: ...
 // [x] parse manga list for chapters and arcs (cache in data/data.json)
-// [ ] check for missing chapters in data/downloads
-// [ ] get next chapter to download
-// [ ] parse url to chapter and get all available pages
+// [x] check for missing chapters in data/downloads
+// [x] get next chapter to download
+// [-] parse url to chapter and get all available pages
 // [ ] download each page (jpg 01-??)
 // [ ] merge all jpg's to a pdf with ImageMagic (`convert "*.{jpg}" -quality 100 -density 150 "<nr.> <chapter name>.pdf"`)
 // [ ] mark chapter as complete in "data/data.json"
@@ -43,7 +45,22 @@ func main() {
 			fmt.Sprintf("%04d %s", chapter.Number, chapter.Name),
 		)
 
-		// TODO: ...
-		log.Printf("[DEBUG] @TODO: check if chapter \"%s\" exists", path)
+		_, err := os.Stat(path + ".pdf")
+		if err != nil {
+			// file does not exists, mark download
+			download(chapter, path)
+			sleep()
+		}
 	}
+}
+
+func download(chapter Data.Chapter, path string) {
+	// TODO: ...
+	log.Printf("[DEBUG] @TODO: download the %d pages to \"%s\"", chapter.Pages, path)
+
+	log.Printf("[DEBUG] @TODO: and convert to \"%s\"", path+".pdf")
+}
+
+func sleep() {
+	time.Sleep(time.Millisecond * time.Duration(settings.DownloadDelay))
 }
