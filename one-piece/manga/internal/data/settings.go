@@ -8,8 +8,8 @@ var (
 
 // Settings
 type Settings struct {
-	// ChaptersPerDay to download
-	ChaptersPerDay int `json:"ChaptersPerDay"`
-	// Delay is the time in ms to wait between downloads
-	Delay int `json:"delay"`
+	// MaxChapterDownloadsDerDay to download
+	MaxChapterDownloadsDerDay int `json:"max-chapter-downloads-per-day"`
+	// DownloadDelay is the time in ms to wait between downloads
+	DownloadDelay int `json:"download-delay"`
 }
