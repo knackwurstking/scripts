@@ -57,7 +57,7 @@ func main() {
 func download(chapter Data.MangaList_Chapter, path string) {
 	log.Printf("[DEBUG] @TODO: download the %d pages to \"%s\"", chapter.Pages, path)
 
-	// TODO: download jpg/png from dURL - scrape the same script section like before
+	// download jpg/png from dURL - scrape the same script section like before
 	chapterData, err := scraper.ParseChapter()
 	if err != nil {
 		log.Printf("[ERROR] %s\n", err)
