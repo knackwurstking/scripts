@@ -58,13 +58,15 @@ func download(chapter Data.MangaList_Chapter, path string) {
 	log.Printf("[DEBUG] @TODO: download the %d pages to \"%s\"", chapter.Pages, path)
 
 	// download jpg/png from dURL - scrape the same script section like before
-	chapterData, err := scraper.ParseChapter()
+	chapterData, err := scraper.ParseChapter(chapter.Href)
 	if err != nil {
 		log.Printf("[ERROR] %s\n", err)
 		return
 	}
 
-	// TODO: store json data to "<path>/data.json" first
+	// store json data to "<path>/data.json" first
+	d, _ := json.MarshalIndent(chapterData, "", "    ")
+	os.WriteFile(filepath.Join(path, "data.json"), d, 0644)
 
 	for i, page := range chapterData.Chapter.Pages {
 		// TODO: download image from `page.Url` and save as ("%02d", i)
