@@ -15,19 +15,19 @@ func ParseMangaList() (data *Data.MangaList, err error) {
 	c := colly.NewCollector()
 
 	c.OnHTML("script", func(e *colly.HTMLElement) {
+		e.Text = strings.Trim(e.Text, " ")
 		if len(e.Text) < 13 {
 			return
 		}
 
 		if e.Text[0:13] == "window.__data" {
-			t := e.Text
-			t, _ = strings.CutPrefix(t, "window.__data")
-			t = strings.TrimLeft(t, " =")
-			t = strings.TrimRight(t, "; ")
+			e.Text, _ = strings.CutPrefix(e.Text, "window.__data")
+			e.Text = strings.TrimLeft(e.Text, " =")
+			e.Text = strings.TrimRight(e.Text, "; ")
 
 			//os.WriteFile(filepath.Join("data", "window-data.parsed.json"), []byte(t), 0644)
 
-			if err := json.Unmarshal([]byte(t), data); err != nil {
+			if err := json.Unmarshal([]byte(e.Text), data); err != nil {
 				log.Printf("[ERROR] %s\n", err)
 			}
 		}
