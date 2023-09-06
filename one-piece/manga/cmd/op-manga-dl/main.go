@@ -50,7 +50,8 @@ func main() {
 			_ = os.MkdirAll(path, 0755)
 			download(chapter, path)
 
-			if time.Now().Weekday() == settings.FetchDate && time.Now().Hour() >= settings.FetchTime {
+			if time.Now().Weekday() == settings.FetchDate &&
+				time.Now().Hour() >= settings.FetchTime {
 				ml, err = fetchUpdate(ml)
 				if err != nil {
 					log.Printf("[ERROR] %s\n", err)
@@ -69,7 +70,7 @@ func fetchUpdate(ml *Data.MangaList) (*Data.MangaList, error) {
 	}
 
 	d, _ := json.MarshalIndent(ml, "", "    ")
-	os.WriteFile(filepath.Join("data", "data.json"), d, 0644)
+	os.WriteFile(filepath.Join(settings.CacheDir, "data.json"), d, 0644)
 
 	return _ml, err
 }

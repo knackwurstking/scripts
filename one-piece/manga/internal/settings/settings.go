@@ -5,21 +5,25 @@ import (
 	"log"
 	"op-manga-dl/internal/data"
 	"os"
+	"path/filepath"
 	"time"
 )
 
 var (
+	SettingsLocation string = filepath.Join("data", "settings.json")
+	CacheDir         string = "data"
+
 	MaxChapterDownloadsPerDay int
 	DownloadDelay             int
 	DataDownloadDir           string
-	FetchDate                 = time.Thursday
-	FetchTime                 = 18
+	FetchDate                 time.Weekday
+	FetchTime                 int
 )
 
 func init() {
-	file, err := os.Open(data.SettingsLocation)
+	file, err := os.Open(SettingsLocation)
 	if err != nil {
-		log.Printf("[WARN] Failed to load configuration from \"%s\"!", data.SettingsLocation)
+		log.Printf("[WARN] Failed to load configuration from \"%s\"!", SettingsLocation)
 		return
 	}
 
@@ -31,4 +35,6 @@ func init() {
 	MaxChapterDownloadsPerDay = s.MaxChapterDownloadsPerDay
 	DownloadDelay = s.DownloadDelay
 	DataDownloadDir = s.DataDownloadDir
+	FetchDate = s.FetchDate
+	FetchTime = s.FetchTime
 }
