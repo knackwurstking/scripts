@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	Data "op-manga-dl/internal/data"
@@ -57,7 +58,7 @@ func main() {
 }
 
 func download(chapter Data.MangaList_Chapter, path string) {
-	log.Printf("[INFO] Download the %d pages to \"%s\"\n", chapter.Pages, path)
+	log.Printf("[INFO] Download the %d pages to \"%s\"", chapter.Pages, path)
 
 	// download jpg/png from dURL - scrape the same script section like before
 	chapterData, err := scraper.ParseChapter(chapter.Href)
@@ -71,35 +72,35 @@ func download(chapter Data.MangaList_Chapter, path string) {
 	os.WriteFile(filepath.Join(path, "data.json"), d, 0644)
 
 	for i, page := range chapterData.Chapter.Pages {
-		log.Printf("[INFO] Downloading \"%s\"\n", page.Url)
+		log.Printf("[INFO] Downloading \"%s\"", page.Url)
 		r, err := http.Get(page.Url)
 		if err != nil {
-			log.Printf("[ERROR] Error while downloading page %d: %s\n", i+1, err)
+			log.Printf("[ERROR] Error while downloading page %d: %s", i+1, err)
 			return
 		}
-		var data []byte
-		n, err := r.Body.Read(data)
+		data, err := io.ReadAll(r.Body)
 		if err != nil {
-			log.Printf("[ERROR] Reading body data for page %d: %s\n", i+1, err)
+			log.Printf("[ERROR] Reading body data for page %d: %s", i+1, err)
 			return
 		}
-		if n == 0 {
-			log.Printf("[ERROR] No data to read for page %d\n", i+1)
+		if len(data) == 0 {
+			log.Printf("[ERROR] No data to read for page %d", i+1)
 			return
 		}
 		e, _ := utils.GetExtension(page.Type)
 		p := filepath.Join(path, fmt.Sprintf("%02d.%s", i+1, e))
 		err = os.WriteFile(p, data, 0644)
 		if err != nil {
-			log.Printf("[ERROR] Write file \"%s\" failed: %s\n", p, err)
+			log.Printf("[ERROR] Write file \"%s\" failed: %s", p, err)
 		}
 	}
 
 	if err := utils.ConvertImagesToPDF(path); err != nil {
-		log.Printf("[ERROR] Convert pages to pdf failed: %s\n", err)
+		log.Printf("[ERROR] Convert pages to pdf failed: %s", err)
 	}
 }
 
 func sleep() {
+	log.Printf("[INFO] Wait %d ms...", settings.DownloadDelay)
 	time.Sleep(time.Millisecond * time.Duration(settings.DownloadDelay))
 }
