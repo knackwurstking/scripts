@@ -27,8 +27,8 @@ func GetExtension(t string) (ext string, err error) {
 }
 
 func ConvertImagesToPDF(p string) error {
-	log.Printf("[INFO] Run: `%s %s %s %s`", "magick", filepath.Join(p, "*.{jpg,png}"), "-quality 100 -density 150", p+".pdf")
-	cmd := exec.Command("magick", filepath.Join(p, "*.{jpg,png}"), "-quality", "100", "-density", "150", p+".pdf")
+	log.Printf("[INFO] Run: `%s %s %s %s`", "magick", "\""+filepath.Join(p, "*.{jpg,png}")+"\"", "-quality 100 -density 150", "\""+p+".pdf\"")
+	cmd := exec.Command("magick", "\""+filepath.Join(p, "*.{jpg,png}")+"\"", "-quality", "100", "-density", "150", "\""+p+".pdf\"")
 	_, err := cmd.Output()
 	return err
 }
