@@ -25,16 +25,13 @@ import (
 // [ ] mark chapter as complete in "data/data.json"
 
 func main() {
-	mangaList, err := scraper.ParseMangaList()
+	ml, err := fetchUpdate(nil)
 	if err != nil {
 		log.Fatalf("[FATAL] %s\n", err)
 	}
 
-	d, _ := json.MarshalIndent(mangaList, "", "    ")
-	os.WriteFile(filepath.Join("data", "data.json"), d, 0644)
-
-	for _, chapter := range mangaList.Chapters {
-		arc, i := mangaList.GetArc(chapter.ArcId)
+	for _, chapter := range ml.Chapters {
+		arc, i := ml.GetArc(chapter.ArcId)
 		if arc == nil {
 			log.Fatalf(
 				"[FATAL] Arc for %s with the id %d not found! (This should never happen)\n",
@@ -44,7 +41,7 @@ func main() {
 
 		path := filepath.Join(
 			settings.DataDownloadDir,
-			fmt.Sprintf("%03d %s", len(mangaList.Arcs)-i, arc.Name),
+			fmt.Sprintf("%03d %s", len(ml.Arcs)-i, arc.Name),
 			fmt.Sprintf("%04d %s", chapter.Number, chapter.Name),
 		)
 
@@ -52,9 +49,28 @@ func main() {
 		if err != nil {
 			_ = os.MkdirAll(path, 0755)
 			download(chapter, path)
+
+			// TODO: only fetch an update on tuesday or thursday? @ 20:00
+			//ml, err = fetchUpdate(ml)
+			//if err != nil {
+			//	log.Fatalf("[ERROR] %s\n", err)
+			//}
+
 			sleep()
 		}
 	}
+}
+
+func fetchUpdate(ml *Data.MangaList) (*Data.MangaList, error) {
+	_ml, err := scraper.ParseMangaList()
+	if err != nil {
+		return ml, err
+	}
+
+	d, _ := json.MarshalIndent(ml, "", "    ")
+	os.WriteFile(filepath.Join("data", "data.json"), d, 0644)
+
+	return _ml, err
 }
 
 func download(chapter Data.MangaList_Chapter, path string) {
@@ -104,7 +120,6 @@ func download(chapter Data.MangaList_Chapter, path string) {
 }
 
 func sleep() {
-	// TODO: fetch a new update for the `MangaList` (only @ some specific times)
 	log.Printf("[INFO] Wait %d ms...", settings.DownloadDelay)
 	time.Sleep(time.Millisecond * time.Duration(settings.DownloadDelay))
 }
