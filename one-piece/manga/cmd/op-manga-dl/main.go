@@ -44,7 +44,7 @@ func main() {
 
 		path := filepath.Join(
 			settings.DataDownloadDir,
-			fmt.Sprintf("%03d %s", i, arc.Name),
+			fmt.Sprintf("%03d %s", len(mangaList.Arcs)-i, arc.Name),
 			fmt.Sprintf("%04d %s", chapter.Number, chapter.Name),
 		)
 
