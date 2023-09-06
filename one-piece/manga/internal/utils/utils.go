@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 )
 
@@ -36,6 +37,7 @@ func ConvertImagesToPDF(path string, images ...string) error {
 	err := cmd.Run()
 	if err != nil {
 		log.Println("[DEBUG]", stderr.String())
+		_ = os.Remove(path + ".pdf")
 	}
 
 	return err
