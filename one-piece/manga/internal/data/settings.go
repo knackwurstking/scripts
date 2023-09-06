@@ -21,7 +21,7 @@ type Settings struct {
 func NewSettings() *Settings {
 	return &Settings{
 		MaxChapterDownloadsPerDay: 10,
-		DownloadDelay:             60000,
+		DownloadDelay:             60000 * 30, // NOTE: 30 min
 		DataDownloadDir:           filepath.Join("data", "downloads"),
 	}
 }
