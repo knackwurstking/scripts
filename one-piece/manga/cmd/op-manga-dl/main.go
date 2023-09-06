@@ -71,6 +71,7 @@ func download(chapter Data.MangaList_Chapter, path string) {
 	d, _ := json.MarshalIndent(chapterData, "", "    ")
 	os.WriteFile(filepath.Join(path, "data.json"), d, 0644)
 
+	pages := make([]string, len(chapterData.Chapter.Pages))
 	for i, page := range chapterData.Chapter.Pages {
 		log.Printf("[INFO] Downloading \"%s\"", page.Url)
 		r, err := http.Get(page.Url)
@@ -92,10 +93,12 @@ func download(chapter Data.MangaList_Chapter, path string) {
 		err = os.WriteFile(p, data, 0644)
 		if err != nil {
 			log.Printf("[ERROR] Write file \"%s\" failed: %s", p, err)
+			return
 		}
+		pages[i] = p
 	}
 
-	if err := utils.ConvertImagesToPDF(path); err != nil {
+	if err := utils.ConvertImagesToPDF(path, pages...); err != nil {
 		log.Printf("[ERROR] Convert pages to pdf failed: %s", err)
 	}
 }

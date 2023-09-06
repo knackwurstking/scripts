@@ -1,10 +1,10 @@
 package utils
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os/exec"
-	"path/filepath"
 )
 
 const (
@@ -26,9 +26,17 @@ func GetExtension(t string) (ext string, err error) {
 	return ext, err
 }
 
-func ConvertImagesToPDF(p string) error {
-	log.Printf("[INFO] Run: `%s %s %s %s`", "magick", "\""+filepath.Join(p, "*.{jpg,png}")+"\"", "-quality 100 -density 150", "\""+p+".pdf\"")
-	cmd := exec.Command("magick", "\""+filepath.Join(p, "*.{jpg,png}")+"\"", "-quality", "100", "-density", "150", "\""+p+".pdf\"")
-	_, err := cmd.Output()
+func ConvertImagesToPDF(path string, images ...string) error {
+	images = append(images, "-quality", "100", "-density", "150", path+".pdf")
+
+	var stderr bytes.Buffer
+	cmd := exec.Command("magick", images...)
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+	if err != nil {
+		log.Println("[DEBUG]", stderr.String())
+	}
+
 	return err
 }
