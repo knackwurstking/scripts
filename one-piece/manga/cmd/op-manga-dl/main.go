@@ -104,6 +104,7 @@ func download(chapter Data.MangaList_Chapter, path string) {
 }
 
 func sleep() {
+	// TODO: fetch a new update for the `MangaList` (only @ some specific times)
 	log.Printf("[INFO] Wait %d ms...", settings.DownloadDelay)
 	time.Sleep(time.Millisecond * time.Duration(settings.DownloadDelay))
 }
