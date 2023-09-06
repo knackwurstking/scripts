@@ -1,0 +1,9 @@
+[Unit]
+Description=One Piece Manga Downloader
+After=network.target
+
+[Service]
+ExecStart=/mnt/media/Data/.src/scripts/one-piece/manga/op-manga-dl
+
+[Install]
+WantedBy=default.target
