@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	Data "op-manga-dl/internal/data"
 	"op-manga-dl/internal/scraper" // this will load the configuration (settings.json) file
 	"op-manga-dl/internal/settings"
+	"op-manga-dl/internal/utils"
 	"os"
 	"path/filepath"
 	"time"
@@ -16,8 +18,8 @@ import (
 // [x] parse manga list for chapters and arcs (cache in data/data.json)
 // [x] check for missing chapters in data/downloads
 // [x] get next chapter to download
-// [-] parse url to chapter and get all available pages
-// [ ] download each page (jpg 01-??)
+// [x] parse url to chapter and get all available pages
+// [x] download each page (jpg 01-??)
 // [ ] merge all jpg's to a pdf with ImageMagic (`convert "*.{jpg}" -quality 100 -density 150 "<nr.> <chapter name>.pdf"`)
 // [ ] mark chapter as complete in "data/data.json"
 
@@ -47,7 +49,7 @@ func main() {
 
 		_, err := os.Stat(path + ".pdf")
 		if err != nil {
-			// file does not exists, mark download
+			_ = os.MkdirAll(path, 0755)
 			download(chapter, path)
 			sleep()
 		}
@@ -55,7 +57,7 @@ func main() {
 }
 
 func download(chapter Data.MangaList_Chapter, path string) {
-	log.Printf("[DEBUG] @TODO: download the %d pages to \"%s\"", chapter.Pages, path)
+	log.Printf("[INFO] Download the %d pages to \"%s\"\n", chapter.Pages, path)
 
 	// download jpg/png from dURL - scrape the same script section like before
 	chapterData, err := scraper.ParseChapter(chapter.Href)
@@ -69,10 +71,33 @@ func download(chapter Data.MangaList_Chapter, path string) {
 	os.WriteFile(filepath.Join(path, "data.json"), d, 0644)
 
 	for i, page := range chapterData.Chapter.Pages {
-		// TODO: download image from `page.Url` and save as ("%02d", i)
+		log.Printf("[INFO] Downloading \"%s\"\n", page.Url)
+		r, err := http.Get(page.Url)
+		if err != nil {
+			log.Printf("[ERROR] Error while downloading page %d: %s\n", i+1, err)
+			return
+		}
+		var data []byte
+		n, err := r.Body.Read(data)
+		if err != nil {
+			log.Printf("[ERROR] Reading body data for page %d: %s\n", i+1, err)
+			return
+		}
+		if n == 0 {
+			log.Printf("[ERROR] No data to read for page %d\n", i+1)
+			return
+		}
+		e, _ := utils.GetExtension(page.Type)
+		p := filepath.Join(path, fmt.Sprintf("%02d.%s", i+1, e))
+		err = os.WriteFile(p, data, 0644)
+		if err != nil {
+			log.Printf("[ERROR] Write file \"%s\" failed: %s\n", p, err)
+		}
 	}
 
-	log.Printf("[DEBUG] @TODO: and convert to \"%s\"", path+".pdf")
+	if err := utils.ConvertImagesToPDF(path); err != nil {
+		log.Printf("[ERROR] Convert pages to pdf failed: %s\n", err)
+	}
 }
 
 func sleep() {
