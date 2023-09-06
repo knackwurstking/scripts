@@ -3,6 +3,7 @@ Description=One Piece Manga Downloader
 After=network.target
 
 [Service]
+WorkingDirectory=/mnt/media/Data/.src/scripts/one-piece/manga/
 ExecStart=/mnt/media/Data/.src/scripts/one-piece/manga/op-manga-dl
 
 [Install]
