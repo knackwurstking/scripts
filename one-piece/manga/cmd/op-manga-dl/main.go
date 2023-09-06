@@ -50,11 +50,12 @@ func main() {
 			_ = os.MkdirAll(path, 0755)
 			download(chapter, path)
 
-			// TODO: only fetch an update on tuesday or thursday? @ 20:00
-			//ml, err = fetchUpdate(ml)
-			//if err != nil {
-			//	log.Printf("[ERROR] %s\n", err)
-			//}
+			if time.Now().Weekday() == settings.FetchDate && time.Now().Hour() >= settings.FetchTime {
+				ml, err = fetchUpdate(ml)
+				if err != nil {
+					log.Printf("[ERROR] %s\n", err)
+				}
+			}
 
 			sleep()
 		}

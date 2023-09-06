@@ -5,12 +5,15 @@ import (
 	"log"
 	"op-manga-dl/internal/data"
 	"os"
+	"time"
 )
 
 var (
 	MaxChapterDownloadsPerDay int
 	DownloadDelay             int
 	DataDownloadDir           string
+	FetchDate                 = time.Thursday
+	FetchTime                 = 18
 )
 
 func init() {
