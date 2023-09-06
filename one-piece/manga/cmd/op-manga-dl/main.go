@@ -53,7 +53,7 @@ func main() {
 			// TODO: only fetch an update on tuesday or thursday? @ 20:00
 			//ml, err = fetchUpdate(ml)
 			//if err != nil {
-			//	log.Fatalf("[ERROR] %s\n", err)
+			//	log.Printf("[ERROR] %s\n", err)
 			//}
 
 			sleep()
