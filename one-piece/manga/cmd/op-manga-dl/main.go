@@ -15,15 +15,6 @@ import (
 	"time"
 )
 
-// TODO: ...
-// [x] parse manga list for chapters and arcs (cache in data/data.json)
-// [x] check for missing chapters in data/downloads
-// [x] get next chapter to download
-// [x] parse url to chapter and get all available pages
-// [x] download each page (jpg 01-??)
-// [ ] merge all jpg's to a pdf with ImageMagic (`convert "*.{jpg}" -quality 100 -density 150 "<nr.> <chapter name>.pdf"`)
-// [ ] mark chapter as complete in "data/data.json"
-
 func main() {
 	ml, err := fetchUpdate(nil)
 	if err != nil {
@@ -50,8 +41,8 @@ func main() {
 			_ = os.MkdirAll(path, 0755)
 			download(chapter, path)
 
-			if time.Now().Weekday() == settings.FetchDate &&
-				time.Now().Hour() >= settings.FetchTime {
+			if time.Now().Weekday() == settings.FetchWeekDay &&
+				time.Now().Hour() >= settings.FetchHour {
 				ml, err = fetchUpdate(ml)
 				if err != nil {
 					log.Printf("[ERROR] %s\n", err)
@@ -61,6 +52,8 @@ func main() {
 			sleep()
 		}
 	}
+
+    // TODO: sleep until next release day (`settings.FetchWeekDay` and `settings.FetchHour`)
 }
 
 func fetchUpdate(ml *Data.MangaList) (*Data.MangaList, error) {

@@ -16,8 +16,8 @@ var (
 	MaxChapterDownloadsPerDay int
 	DownloadDelay             int
 	DataDownloadDir           string
-	FetchDate                 time.Weekday
-	FetchTime                 int
+	FetchWeekDay              time.Weekday
+	FetchHour                 int
 )
 
 func init() {
@@ -35,6 +35,6 @@ func init() {
 	MaxChapterDownloadsPerDay = s.MaxChapterDownloadsPerDay
 	DownloadDelay = s.DownloadDelay
 	DataDownloadDir = s.DataDownloadDir
-	FetchDate = s.FetchDate
-	FetchTime = s.FetchTime
+	FetchWeekDay = s.FetchWeekDay
+	FetchHour = s.FetchHour
 }
