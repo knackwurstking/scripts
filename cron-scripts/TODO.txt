@@ -1,2 +1,3 @@
-- Backup "/mnt/media/Data/Documents"
 - Auto save all backups in "/mnt/media/backups" to a external drive (mount only if needed)
+- Backup "/mnt/media/Data/Documents"
+- Backup "/mnt/media/Data" one piece directory
