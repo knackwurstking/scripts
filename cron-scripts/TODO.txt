@@ -1,4 +1,0 @@
-- Create a small golang backup tool instead of the .sh scripts
-    - `backup -src /mnt/media/Data/Documents -dst /mnt/media/Backups/Data/Documents`
-    - allow flags like `-quiet, -log-file <path>`
-- Backup "/mnt/media/Data" one piece directory
