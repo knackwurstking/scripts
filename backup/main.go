@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/codeskyblue/go-sh"
 )
@@ -72,9 +73,32 @@ func checkDestination() {
 }
 
 func runBackup() {
+    date := time.Now()
+
+    cwd := filepath.Dir(src)
+    base := filepath.Base(src)
+
+    out := filepath.Join(
+        dst,
+        fmt.Sprintf(
+            "%s-%d-%02d-%02d.tar.gz",
+            base, date.Year(), date.Month(), date.Day(),
+        ),
+    )
+
     session := sh.NewSession()
 
-    // TODO: run the backup using tar command
+    session.Command(
+        "tar",
+        "--create",
+        "--gzip",
+        "--preserve-permissions",
+        "--file",
+        out,
+        "-C",
+        cwd,
+        base,
+    )
 
     err := session.Run()
     if err != nil {
