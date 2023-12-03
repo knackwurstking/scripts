@@ -13,6 +13,7 @@ import (
 var (
     src string
     dst string
+    system bool
 )
 
 func main() {
@@ -25,6 +26,7 @@ func main() {
 func parseFlags() {
     flag.StringVar(&src, "src", src, "source path to backup")
     flag.StringVar(&dst, "dst", dst, "destination directory")
+    flag.BoolVar(&system, "system", system, "using bsdtar for backup")
 
     flag.Usage = func() {
         fmt.Fprintf(os.Stderr, "Usage: %s [-quiet] -src <path> -dst <path>\n", os.Args[0])
@@ -88,17 +90,29 @@ func runBackup() {
 
     session := sh.NewSession()
 
-    session.Command(
-        "tar",
-        "--create",
-        "--gzip",
-        "--preserve-permissions",
-        "--file",
-        out,
-        "-C",
-        cwd,
-        base,
-    )
+    if system {
+        session.Command(
+            "bsdtar",
+            "--exclude="+dst,
+            "--acls",
+            "--xattrs",
+            "-cpvaf",
+            out,
+            src,
+        )
+    } else {
+        session.Command(
+            "tar",
+            "--create",
+            "--gzip",
+            "--preserve-permissions",
+            "--file",
+            out,
+            "-C",
+            cwd,
+            base,
+        )
+    }
 
     err := session.Run()
     if err != nil {
