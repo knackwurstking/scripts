@@ -20,7 +20,9 @@ func main() {
         now := time.Now()
         next := time.Date(now.Year(), now.Month(), now.Day()+1, settings.FetchHour, 0, 0, 0, time.Local)
 
-        time.Sleep(next.Sub(now))
+        duration := next.Sub(now)
+        log.Printf("[DEBUG] Sleep a while: %d", duration)
+        time.Sleep(duration)
 
         if next.Weekday() == settings.FetchWeekDay {
             downloadAllChapters()
@@ -29,6 +31,8 @@ func main() {
 }
 
 func downloadAllChapters() {
+    log.Printf("[DEBUG] download all chapters available")
+
 	ml, err := scraper.ParseMangaList()
 	if err != nil {
 		log.Fatalf("[FATAL] %s", err)
