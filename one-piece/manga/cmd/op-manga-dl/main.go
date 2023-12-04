@@ -14,9 +14,17 @@ import (
 )
 
 func main() {
+    downloadAllChapters()
+
     for true {
-        downloadAllChapters()
-        // TODO: sleep until next release day (`settings.FetchWeekDay` and `settings.FetchHour`)
+        now := time.Now()
+        next := time.Date(now.Year(), now.Month(), now.Day()+1, settings.FetchHour, 0, 0, 0, time.Local)
+
+        time.Sleep(next.Sub(now))
+
+        if next.Weekday() == settings.FetchWeekDay {
+            downloadAllChapters()
+        }
     }
 }
 
