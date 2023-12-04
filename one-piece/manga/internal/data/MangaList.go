@@ -1,5 +1,7 @@
 package data
 
+// TODO: move MangaList* types to ../scraper/
+
 type MangaList_Special struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
