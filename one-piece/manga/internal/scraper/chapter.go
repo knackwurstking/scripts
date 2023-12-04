@@ -3,14 +3,29 @@ package scraper
 import (
 	"encoding/json"
 	"log"
-	Data "op-manga-dl/internal/data"
 	"strings"
 
 	"github.com/gocolly/colly/v2"
 )
 
-func ParseChapter(chapterURL string) (data *Data.ChapterData, err error) {
-	data = &Data.ChapterData{}
+type ChapterData_Page struct {
+	Url    string `json:"url"`
+	Height int    `json:"height"`
+	Width  int    `json:"width"`
+	Type   string `json:"type"` // "image/png" | "image/jpeg"
+}
+
+type ChapterData_Chapter struct {
+	Name  string             `json:"name"`
+	Pages []ChapterData_Page `json:"pages"`
+}
+
+type ChapterData struct {
+	Chapter ChapterData_Chapter `json:"chapter"`
+}
+
+func ParseChapter(chapterURL string) (data *ChapterData, err error) {
+	data = &ChapterData{}
 	c := colly.NewCollector()
 
 	c.OnHTML("script", func(e *colly.HTMLElement) {
