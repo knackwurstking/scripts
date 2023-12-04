@@ -16,16 +16,23 @@ import (
 )
 
 func main() {
-	ml, err := fetchUpdate(nil)
+    for true {
+        downloadAllChapters()
+        // TODO: sleep until next release day (`settings.FetchWeekDay` and `settings.FetchHour`)
+    }
+}
+
+func downloadAllChapters() {
+	ml, err := scraper.ParseMangaList()
 	if err != nil {
-		log.Fatalf("[FATAL] %s\n", err)
+		log.Fatalf("[FATAL] %s", err)
 	}
 
 	for _, chapter := range ml.Chapters {
 		arc, i := ml.GetArc(chapter.ArcId)
 		if arc == nil {
 			log.Fatalf(
-				"[FATAL] Arc for %s with the id %d not found! (This should never happen)\n",
+				"[FATAL] Arc for %s with the id %d not found! (This should never happen)",
 				chapter.Name, chapter.ArcId,
 			)
 		}
@@ -39,36 +46,25 @@ func main() {
 		_, err := os.Stat(path + ".pdf")
 		if err != nil {
 			_ = os.MkdirAll(path, 0755)
-			download(chapter, path)
+			downloadChapter(chapter, path)
 
 			if time.Now().Weekday() == settings.FetchWeekDay &&
 				time.Now().Hour() >= settings.FetchHour {
-				ml, err = fetchUpdate(ml)
+
+                newMl, err := scraper.ParseMangaList()
 				if err != nil {
-					log.Printf("[ERROR] %s\n", err)
-				}
+					log.Printf("[ERROR] %s", err)
+				} else {
+                    ml = newMl
+                }
 			}
 
 			sleep()
 		}
 	}
-
-    // TODO: sleep until next release day (`settings.FetchWeekDay` and `settings.FetchHour`)
 }
 
-func fetchUpdate(ml *Data.MangaList) (*Data.MangaList, error) {
-	_ml, err := scraper.ParseMangaList()
-	if err != nil {
-		return ml, err
-	}
-
-	d, _ := json.MarshalIndent(ml, "", "    ")
-	os.WriteFile(filepath.Join(settings.CacheDir, "data.json"), d, 0644)
-
-	return _ml, err
-}
-
-func download(chapter Data.MangaList_Chapter, path string) {
+func downloadChapter(chapter Data.MangaList_Chapter, path string) {
 	log.Printf("[INFO] Download the %d pages to \"%s\"", chapter.Pages, path)
 
 	// download jpg/png from dURL - scrape the same script section like before
@@ -77,10 +73,6 @@ func download(chapter Data.MangaList_Chapter, path string) {
 		log.Printf("[ERROR] %s\n", err)
 		return
 	}
-
-	// store json data to "<path>/data.json" first
-	d, _ := json.MarshalIndent(chapterData, "", "    ")
-	os.WriteFile(filepath.Join(path, "data.json"), d, 0644)
 
 	pages := make([]string, len(chapterData.Chapter.Pages))
 	for i, page := range chapterData.Chapter.Pages {
