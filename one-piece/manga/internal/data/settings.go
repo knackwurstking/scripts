@@ -1,5 +1,7 @@
 package data
 
+// TODO: move to ../settings/settings.go
+
 import (
 	"path/filepath"
 	"time"

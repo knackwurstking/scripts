@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	Data "op-manga-dl/internal/data"
 	"op-manga-dl/internal/scraper" // this will load the configuration (settings.json) file
 	"op-manga-dl/internal/settings"
 	"op-manga-dl/internal/utils"
@@ -63,7 +62,7 @@ func downloadAllChapters() {
 	}
 }
 
-func downloadChapter(chapter Data.MangaList_Chapter, path string) {
+func downloadChapter(chapter scraper.MangaList_Chapter, path string) {
 	log.Printf("[INFO] Download the %d pages to \"%s\"", chapter.Pages, path)
 
 	// download jpg/png from dURL - scrape the same script section like before

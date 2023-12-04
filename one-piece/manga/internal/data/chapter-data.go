@@ -1,5 +1,7 @@
 package data
 
+// TODO: move to ../scraper/Chapter.go
+
 type ChapterData_Page struct {
 	Url    string `json:"url"`
 	Height int    `json:"height"`

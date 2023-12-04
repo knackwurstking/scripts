@@ -1,6 +1,12 @@
-package data
+package scraper
 
-// TODO: move MangaList* types to ../scraper/
+import (
+	"encoding/json"
+	"log"
+	"strings"
+
+	"github.com/gocolly/colly/v2"
+)
 
 type MangaList_Special struct {
 	Id   int    `json:"id"`
@@ -42,4 +48,43 @@ func (mangaList *MangaList) GetArc(id int) (arc *MangaList_Arc, index int) {
 	}
 
 	return nil, -1
+}
+
+// ParseMangaList
+func ParseMangaList() (data *MangaList, err error) {
+	data = &MangaList{}
+	c := colly.NewCollector()
+
+	c.OnHTML("script", func(e *colly.HTMLElement) {
+		e.Text = strings.Trim(e.Text, " ")
+		if len(e.Text) < 13 {
+			return
+		}
+
+		if e.Text[0:13] == "window.__data" {
+			e.Text, _ = strings.CutPrefix(e.Text, "window.__data")
+			e.Text = strings.TrimLeft(e.Text, " =")
+			e.Text = strings.TrimRight(e.Text, "; ")
+
+			if err := json.Unmarshal([]byte(e.Text), data); err != nil {
+				log.Printf("[ERROR] %s\n", err)
+			}
+		}
+	})
+
+	c.OnRequest(func(r *colly.Request) {
+		log.Printf("[DEBUG] request to \"%s\"\n", r.URL)
+	})
+
+	c.OnError(func(r *colly.Response, e error) {
+		err = e
+	})
+
+	if err := c.Visit("https://onepiece-tube.com/manga/kapitel-mangaliste"); err != nil {
+		return data, err
+	}
+
+	c.Wait()
+
+	return data, err
 }
