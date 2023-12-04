@@ -98,7 +98,9 @@ func runBackup() {
             "--xattrs",
             "-cpvaf",
             out,
-            src,
+            "-C",
+            cwd,
+            base,
         )
     } else {
         session.Command(
