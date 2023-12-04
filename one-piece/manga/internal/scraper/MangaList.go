@@ -25,8 +25,6 @@ func ParseMangaList() (data *Data.MangaList, err error) {
 			e.Text = strings.TrimLeft(e.Text, " =")
 			e.Text = strings.TrimRight(e.Text, "; ")
 
-			//os.WriteFile(filepath.Join("data", "window-data.parsed.json"), []byte(t), 0644)
-
 			if err := json.Unmarshal([]byte(e.Text), data); err != nil {
 				log.Printf("[ERROR] %s\n", err)
 			}
