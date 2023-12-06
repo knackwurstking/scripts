@@ -40,10 +40,15 @@ func downloadAllChapters() {
 	}
 
 	for _, chapter := range ml.Chapters {
+        if chapter.Pages == 0 {
+            log.Printf("skip chapter %d with 0 pages", chapter.Number)
+            continue
+        }
+
 		arc, i := ml.GetArc(chapter.ArcId)
 		if arc == nil {
             log.Fatalf(
-                "fatal: Arc for %s with the id %d not found! (This should never happen)",
+                "fatal: arc for %s with the id %d not found! (This should never happen)",
 				chapter.Name, chapter.ArcId,
 			)
 		}
@@ -58,18 +63,6 @@ func downloadAllChapters() {
 		if err != nil {
 			_ = os.MkdirAll(path, 0755)
 			downloadChapter(chapter, path)
-
-			if time.Now().Weekday() == settings.FetchWeekDay &&
-				time.Now().Hour() >= settings.FetchHour {
-
-                newMl, err := scraper.ParseMangaList()
-				if err != nil {
-                    log.Printf("error: %s", err)
-				} else {
-                    ml = newMl
-                }
-			}
-
 			sleep()
 		}
 	}
