@@ -17,23 +17,23 @@ func parseFlags(c *Config) {
     flag.BoolVar(&c.Debug, "debug", c.Debug, "Enable debugging")
 
     flag.IntVar(
-        &c.Download.Delay.Hour,
-        "delay-hour",
-        c.Download.Delay.Hour,
+        &c.Download.Delay.Hours,
+        "delay-hours",
+        c.Download.Delay.Hours,
         "Set delay between downloads",
     )
 
     flag.IntVar(
-        &c.Download.Delay.Minute,
-        "delay-minute",
-        c.Download.Delay.Minute,
+        &c.Download.Delay.Minutes,
+        "delay-minutes",
+        c.Download.Delay.Minutes,
         "Set delay between downloads",
     )
 
     flag.IntVar(
-        &c.Download.Delay.Second,
-        "delay-second",
-        c.Download.Delay.Second,
+        &c.Download.Delay.Seconds,
+        "delay-seconds",
+        c.Download.Delay.Seconds,
         "Set delay between downloads",
     )
 

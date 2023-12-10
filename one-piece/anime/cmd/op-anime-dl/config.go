@@ -8,23 +8,23 @@ import (
 )
 
 type Delay struct {
-	Hour   int `json:"hour"`
-	Minute int `json:"minute"`
-	Second int `json:"second"`
+	Hours   int `json:"hours"`
+	Minutes int `json:"minutes"`
+	Seconds int `json:"seconds"`
 }
 
 func NewDelay(h, m, s int) Delay {
 	return Delay{
-		Hour:   h,
-		Minute: m,
-		Second: s,
+		Hours:   h,
+		Minutes: m,
+		Seconds: s,
 	}
 }
 
 func (d *Delay) GetDuration() time.Duration {
-	return time.Hour*time.Duration(d.Hour) +
-		time.Minute*time.Duration(d.Minute) +
-		time.Second*time.Duration(d.Second)
+	return time.Hour*time.Duration(d.Hours) +
+		time.Minute*time.Duration(d.Minutes) +
+		time.Second*time.Duration(d.Seconds)
 }
 
 type ConfigUpdate struct {
