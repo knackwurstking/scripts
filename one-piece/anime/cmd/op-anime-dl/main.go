@@ -52,7 +52,7 @@ func parseFlags(c *Config) {
     )
 
     weekDay := flag.Int("update-on-day", int(c.Update.WeekDay),
-        "Weekday for update the anime list (0-6)")
+        "Weekday (0-6) for update the anime list")
 
     hour := flag.Int("update-hour", c.Update.Hour,
         "Hour (0-23) for anime list update")
