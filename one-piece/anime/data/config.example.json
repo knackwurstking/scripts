@@ -1,0 +1,16 @@
+{
+    "update": {
+        "week-day": 0,
+        "hour": 18
+    },
+    "download": {
+        "delay": {
+            "hour": 0,
+            "minute": 60,
+            "second": 0
+        },
+        "dst": "data/download",
+        "limit-per-day": 5
+    },
+    "debug": true
+}
