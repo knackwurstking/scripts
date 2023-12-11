@@ -17,7 +17,6 @@ func main() {
 		a         *anime.Anime = anime.New("https://onepiece-tube.com")
 		animeList []anime.Chapter
 		err       error
-		duration  time.Duration
 	)
 
 	for true {
@@ -29,10 +28,12 @@ func main() {
 			iterAnimeList(animeList)
 		}
 
-		// TODO: sleep until next fetch day
-		duration = time.Hour * 5
-		slog.Debug("Sleep until next update day.", "duration", duration)
-		time.Sleep(duration)
+        for true {
+            duration := time.Hour * 5
+            slog.Debug("Sleep until next update day.", "duration", duration)
+            time.Sleep(duration)
+            // TODO: check hour and week-day and break on a match
+        }
 	}
 }
 
