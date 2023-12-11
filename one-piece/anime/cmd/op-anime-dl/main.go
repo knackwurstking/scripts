@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -20,6 +21,7 @@ func main() {
 	)
 
 	for true {
+        slog.Debug("Get anime list.", "url", a.GetUrl(anime.NameAnimeList))
 		animeList, err = a.GetAnimeList()
 		if err != nil {
 			slog.Error("Get anime list failed!", "err", err.Error())
@@ -29,7 +31,7 @@ func main() {
 
 		// TODO: sleep until next fetch day
 		duration = time.Hour * 5
-		slog.Debug("Sleep until next update day", "duration", duration)
+		slog.Debug("Sleep until next update day.", "duration", duration)
 		time.Sleep(duration)
 	}
 }
@@ -37,6 +39,7 @@ func main() {
 func iterAnimeList(animeList []anime.Chapter) {
 	for _, chapter := range animeList {
         // TODO: file name `${chapterNumber}-${episodeName}`
+        fileName := fmt.Sprintf("")
         // TODO: download chapter or skip if already exists
         // TODO: download delay
 	}
@@ -95,4 +98,6 @@ func parseFlags(c *Config) {
 	if *hour >= 0 && *hour <= 23 {
 		c.Update.Hour = *hour
 	}
+
+    // TODO: Enable/Disable debug
 }
