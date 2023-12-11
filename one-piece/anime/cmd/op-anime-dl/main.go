@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log/slog"
+	"os"
 	"time"
 
 	"op-anime-dl/internal/anime"
@@ -21,13 +21,13 @@ func main() {
 	)
 
 	for true {
-        slog.Debug("Get anime list.", "url", a.GetUrl(anime.NameAnimeList))
+		slog.Debug("Get anime list.", "url", a.GetUrl(anime.NameAnimeList))
 		animeList, err = a.GetAnimeList()
 		if err != nil {
 			slog.Error("Get anime list failed!", "err", err.Error())
 		} else {
-            iterAnimeList(animeList)
-        }
+			iterAnimeList(animeList)
+		}
 
 		// TODO: sleep until next fetch day
 		duration = time.Hour * 5
@@ -37,12 +37,13 @@ func main() {
 }
 
 func iterAnimeList(animeList []anime.Chapter) {
-	for _, chapter := range animeList {
-        // TODO: file name `${chapterNumber}-${episodeName}`
-        fileName := fmt.Sprintf("")
-        // TODO: download chapter or skip if already exists
-        // TODO: download delay
-	}
+	//for _, chapter := range animeList {
+	//	// TODO: file name `${chapterNumber}-${episodeName}`
+	//	fileName := fmt.Sprintf("")
+
+	//	// TODO: download chapter or skip if already exists
+	//	// TODO: download delay
+	//}
 }
 
 func parseFlags(c *Config) {
@@ -99,5 +100,26 @@ func parseFlags(c *Config) {
 		c.Update.Hour = *hour
 	}
 
-    // TODO: Enable/Disable debug
+    handlerOptions := &slog.HandlerOptions{
+        ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+            if a.Key == "time" {
+                return slog.Attr{}
+            }
+            return a
+        },
+        Level: slog.LevelInfo,
+    }
+
+	if c.Debug {
+		handlerOptions = &slog.HandlerOptions{
+            ReplaceAttr: handlerOptions.ReplaceAttr,
+            Level: slog.LevelDebug,
+        }
+	}
+
+    slog.SetDefault(
+        slog.New(
+            slog.NewTextHandler(os.Stderr, handlerOptions),
+        ),
+    )
 }
