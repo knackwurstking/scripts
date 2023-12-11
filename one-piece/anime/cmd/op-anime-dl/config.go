@@ -28,7 +28,7 @@ func (d *Delay) GetDuration() time.Duration {
 }
 
 type ConfigUpdate struct {
-	WeekDay time.Weekday `json:"week-day"`
+	Weekday time.Weekday `json:"weekday"`
 	Hour    int          `json:"hour"`
 }
 
@@ -47,7 +47,7 @@ type Config struct {
 func NewConfig() *Config {
 	return &Config{
 		Update: ConfigUpdate{
-			WeekDay: time.Sunday,
+			Weekday: time.Sunday,
 			Hour:    18,
 		},
 		Download: ConfigDownload{

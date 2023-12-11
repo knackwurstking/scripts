@@ -29,10 +29,16 @@ func main() {
 		}
 
         for true {
-            duration := time.Hour * 5
+            now := time.Now()
+            next := time.Date(now.Year(), now.Month(), now.Day()+1, c.Update.Hour, 0, 0, 0, time.Local)
+            duration := next.Sub(now)
             slog.Debug("Sleep until next update day.", "duration", duration)
             time.Sleep(duration)
-            // TODO: check hour and week-day and break on a match
+
+            if time.Now().Weekday() == c.Update.Weekday {
+                slog.Debug("Running new update now...")
+                break
+            }
         }
 	}
 }
@@ -85,7 +91,7 @@ func parseFlags(c *Config) {
 		"Download limit (per day)",
 	)
 
-	weekDay := flag.Int("update-on-day", int(c.Update.WeekDay),
+	weekday := flag.Int("update-on-day", int(c.Update.Weekday),
 		"Weekday (0-6) for update the anime list")
 
 	hour := flag.Int("update-hour", c.Update.Hour,
@@ -93,8 +99,8 @@ func parseFlags(c *Config) {
 
 	flag.Parse()
 
-	if *weekDay >= 0 && *weekDay <= 6 {
-		c.Update.WeekDay = time.Weekday(*weekDay)
+	if *weekday >= 0 && *weekday <= 6 {
+		c.Update.Weekday = time.Weekday(*weekday)
 	}
 
 	if *hour >= 0 && *hour <= 23 {
