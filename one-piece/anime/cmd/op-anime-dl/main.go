@@ -2,68 +2,97 @@ package main
 
 import (
 	"flag"
+	"log/slog"
 	"time"
+
+	"op-anime-dl/internal/anime"
 )
 
 func main() {
-    c := NewConfig()
-    parseFlags(c)
+	c := NewConfig()
+	parseFlags(c)
 
-    // TODO: fetch anime list, before entering the main loop
-    // TODO: main loop, update every sunday @ 18:00
+	var (
+		a         *anime.Anime = anime.New("https://onepiece-tube.com")
+		animeList []anime.Chapter
+		err       error
+		duration  time.Duration
+	)
+
+	for true {
+		animeList, err = a.GetAnimeList()
+		if err != nil {
+			slog.Error("Get anime list failed!", "err", err.Error())
+		} else {
+            iterAnimeList(animeList)
+        }
+
+		// TODO: sleep until next fetch day
+		duration = time.Hour * 5
+		slog.Debug("Sleep until next update day", "duration", duration)
+		time.Sleep(duration)
+	}
+}
+
+func iterAnimeList(animeList []anime.Chapter) {
+	for _, chapter := range animeList {
+        // TODO: file name `${chapterNumber}-${episodeName}`
+        // TODO: download chapter or skip if already exists
+        // TODO: download delay
+	}
 }
 
 func parseFlags(c *Config) {
-    flag.BoolVar(&c.Debug, "debug", c.Debug, "Enable debugging")
+	flag.BoolVar(&c.Debug, "debug", c.Debug, "Enable debugging")
 
-    flag.IntVar(
-        &c.Download.Delay.Hours,
-        "delay-hours",
-        c.Download.Delay.Hours,
-        "Set delay between downloads",
-    )
+	flag.IntVar(
+		&c.Download.Delay.Hours,
+		"delay-hours",
+		c.Download.Delay.Hours,
+		"Set delay between downloads",
+	)
 
-    flag.IntVar(
-        &c.Download.Delay.Minutes,
-        "delay-minutes",
-        c.Download.Delay.Minutes,
-        "Set delay between downloads",
-    )
+	flag.IntVar(
+		&c.Download.Delay.Minutes,
+		"delay-minutes",
+		c.Download.Delay.Minutes,
+		"Set delay between downloads",
+	)
 
-    flag.IntVar(
-        &c.Download.Delay.Seconds,
-        "delay-seconds",
-        c.Download.Delay.Seconds,
-        "Set delay between downloads",
-    )
+	flag.IntVar(
+		&c.Download.Delay.Seconds,
+		"delay-seconds",
+		c.Download.Delay.Seconds,
+		"Set delay between downloads",
+	)
 
-    flag.StringVar(
-        &c.Download.Dst,
-        "dst",
-        c.Download.Dst,
-        "Set destination path for downloads",
-    )
+	flag.StringVar(
+		&c.Download.Dst,
+		"dst",
+		c.Download.Dst,
+		"Set destination path for downloads",
+	)
 
-    flag.IntVar(
-        &c.Download.LimitPerDay,
-        "limit",
-        c.Download.LimitPerDay,
-        "Download limit (per day)",
-    )
+	flag.IntVar(
+		&c.Download.LimitPerDay,
+		"limit",
+		c.Download.LimitPerDay,
+		"Download limit (per day)",
+	)
 
-    weekDay := flag.Int("update-on-day", int(c.Update.WeekDay),
-        "Weekday (0-6) for update the anime list")
+	weekDay := flag.Int("update-on-day", int(c.Update.WeekDay),
+		"Weekday (0-6) for update the anime list")
 
-    hour := flag.Int("update-hour", c.Update.Hour,
-        "Hour (0-23) for anime list update")
+	hour := flag.Int("update-hour", c.Update.Hour,
+		"Hour (0-23) for anime list update")
 
-    flag.Parse()
+	flag.Parse()
 
-    if *weekDay >= 0 && *weekDay <= 6 {
-        c.Update.WeekDay = time.Weekday(*weekDay)
-    }
+	if *weekDay >= 0 && *weekDay <= 6 {
+		c.Update.WeekDay = time.Weekday(*weekDay)
+	}
 
-    if *hour >= 0 && *hour <= 23 {
-        c.Update.Hour = *hour
-    }
+	if *hour >= 0 && *hour <= 23 {
+		c.Update.Hour = *hour
+	}
 }
