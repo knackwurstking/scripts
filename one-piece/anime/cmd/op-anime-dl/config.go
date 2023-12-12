@@ -7,33 +7,14 @@ import (
 	"time"
 )
 
-type Delay struct {
-	Hours   int `json:"hours"`
-	Minutes int `json:"minutes"`
-	Seconds int `json:"seconds"`
-}
-
-func NewDelay(h, m, s int) Delay {
-	return Delay{
-		Hours:   h,
-		Minutes: m,
-		Seconds: s,
-	}
-}
-
-func (d *Delay) GetDuration() time.Duration {
-	return time.Hour*time.Duration(d.Hours) +
-		time.Minute*time.Duration(d.Minutes) +
-		time.Second*time.Duration(d.Seconds)
-}
-
 type ConfigUpdate struct {
 	Weekday time.Weekday `json:"weekday"`
 	Hour    int          `json:"hour"`
 }
 
 type ConfigDownload struct {
-	Delay       Delay  `json:"delay"`
+	Delay       int    `json:"delay"`
+	LongDelay   int    `json:"long-delay"`
 	Dst         string `json:"dst"`
 	LimitPerDay int    `json:"limit-per-day"`
 }
@@ -51,7 +32,8 @@ func NewConfig() *Config {
 			Hour:    18,
 		},
 		Download: ConfigDownload{
-			Delay:       NewDelay(0, 60, 0),
+			Delay:       30,      // 20 min
+			LongDelay:   12 * 60, // 12 hours
 			Dst:         filepath.Join("data", "download"),
 			LimitPerDay: 5,
 		},

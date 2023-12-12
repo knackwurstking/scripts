@@ -91,9 +91,9 @@ func iterAnimeList() {
         currentDownloads += 1
         downloadEntry(path, entry)
 
-        duration := c.Download.Delay.GetDuration()
+        duration := time.Minute * time.Duration(c.Download.Delay)
         if c.Download.LimitPerDay >= currentDownloads {
-            duration = time.Hour * 24
+            duration = time.Minute * time.Duration(c.Download.LongDelay)
             currentDownloads = 0
         }
 
@@ -124,24 +124,17 @@ func parseFlags() {
 	flag.BoolVar(&c.Debug, "debug", c.Debug, "Enable debugging")
 
 	flag.IntVar(
-		&c.Download.Delay.Hours,
-		"delay-hours",
-		c.Download.Delay.Hours,
-		"Set delay between downloads",
+		&c.Download.Delay,
+		"delay",
+		c.Download.Delay,
+		"Set delay in minutes between downloads",
 	)
 
 	flag.IntVar(
-		&c.Download.Delay.Minutes,
-		"delay-minutes",
-		c.Download.Delay.Minutes,
-		"Set delay between downloads",
-	)
-
-	flag.IntVar(
-		&c.Download.Delay.Seconds,
-		"delay-seconds",
-		c.Download.Delay.Seconds,
-		"Set delay between downloads",
+		&c.Download.LongDelay,
+		"delay",
+		c.Download.LongDelay,
+		"Set long delay in minutes if download limit was reached",
 	)
 
 	flag.StringVar(
@@ -153,7 +146,7 @@ func parseFlags() {
 
 	flag.IntVar(
 		&c.Download.LimitPerDay,
-		"limit",
+		"day-limit",
 		c.Download.LimitPerDay,
 		"Download limit (per day)",
 	)
