@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log/slog"
 	"os"
 	"time"
@@ -43,14 +44,18 @@ func main() {
 	}
 }
 
-func iterAnimeList(animeList *anime.Data) {
-	//for _, _ = range animeList {
+func iterAnimeList(animeData *anime.Data) {
+    for _, entry := range animeData.Entries {
 		// TODO: file name `${chapterNumber}-${episodeName}`
-        //fileName := fmt.Sprintf("")
+        fileName := fmt.Sprintf(
+            "%05d %s (sub: %s, dub: %s)",
+            entry.Number, entry.Name, entry.LangSub, entry.LangDub,
+        )
+        slog.Debug("Generate file name", "fileName", fileName)
 
 		// TODO: download chapter or skip if already exists
 		// TODO: download delay
-	//}
+	}
 }
 
 func parseFlags(c *Config) {

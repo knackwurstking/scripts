@@ -23,7 +23,7 @@ type Anime struct {
 func New(origin string) *Anime {
 	return &Anime{
 		Origin: origin,
-		Data:   &Data{},
+		Data:   NewData(),
 	}
 }
 
@@ -85,29 +85,39 @@ func (anime *Anime) GetEpisodenStreams() (*Data, error) {
 }
 
 type Data struct {
-	Options  DataOptions  `json:"options"`
 	Category DataCategory `json:"category"`
-	Specials DataSpecials `json:"specials"`
-	Arcs     DataArcs     `json:"arcs"`
-	Entries  DataEntries  `json:"entries"`
+	Arcs     []DataArc    `json:"arcs"`
+	Entries  []DataEntry  `json:"entries"`
 }
 
-type DataOptions struct {
+func NewData() *Data {
+	return &Data{
+		Category: DataCategory{},
+		Arcs:     make([]DataArc, 0),
+		Entries:  make([]DataEntry, 0),
+	}
 }
 
 type DataCategory struct {
-}
-
-type DataSpecials struct {
-}
-
-type DataArcs struct {
-}
-
-type DataEntries []DataEntry
-
-// TODO: continue here ...
-type DataEntry struct {
 	ID   int    `json:"id"`
+	Type string `json:"type"` // NOTE: "anime"
+}
+
+type DataArc struct {
 	Name string `json:"name"`
+	Min  int    `json:"min"`
+	Max  int    `json:"max"`
+}
+
+type DataEntry struct {
+	Name        string `json:"name"`
+	Number      int    `json:"number"`
+	CategoryID  int    `json:"category_id"` // NOTE: only cateogory 1 "type: anime"
+	ArcID       int    `json:"arc_id"`
+	IsSpecial   bool   `json:"is_special"`
+	IsFiller    bool   `json:"is_filler"`
+	LangSub     string `json:"lang_sub"`
+	LangDub     string `json:"lang_dub"`
+	IsAvailable bool   `json:"is_available"`
+	Href        string `json:"href"`
 }
