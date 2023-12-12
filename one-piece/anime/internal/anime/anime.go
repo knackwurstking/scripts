@@ -37,8 +37,6 @@ func (anime *Anime) GetUrl(name Name) string {
 }
 
 func (anime *Anime) GetEpisodenStreams() (*Data, error) {
-	anime.Data = nil // reset data first
-
 	var (
 		c   = colly.NewCollector()
 		err error
