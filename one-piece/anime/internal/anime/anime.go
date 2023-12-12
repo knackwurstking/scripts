@@ -1,6 +1,7 @@
 package anime
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
@@ -59,11 +60,9 @@ func (anime *Anime) GetEpisodenStreams() (*Data, error) {
             text = strings.TrimLeft(text, " =")
             text = strings.TrimRight(text, "; ")
 
-            // TODO: debugging
-            os.WriteFile("data.json", []byte(text), os.ModeAppend|os.ModePerm)
-            //if err := json.Unmarshal([]byte(text), anime.Data); err != nil {
-            //    slog.Error("Unmarshal data failed!", "err", err.Error())
-            //}
+            if err := json.Unmarshal([]byte(text), anime.Data); err != nil {
+                slog.Error("Unmarshal data failed!", "err", err.Error())
+            }
         }
     })
 
