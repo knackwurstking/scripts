@@ -146,7 +146,7 @@ func parseFlags() {
 
 	flag.IntVar(
 		&c.Download.LimitPerDay,
-		"day-limit",
+		"limit",
 		c.Download.LimitPerDay,
 		"Download limit (per day)",
 	)
