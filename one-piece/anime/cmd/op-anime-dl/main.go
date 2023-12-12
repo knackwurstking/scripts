@@ -92,7 +92,7 @@ func iterAnimeList() {
         downloadEntry(path, entry)
 
         duration := time.Minute * time.Duration(c.Download.Delay)
-        if c.Download.LimitPerDay >= currentDownloads {
+        if currentDownloads >= c.Download.LimitPerDay {
             duration = time.Minute * time.Duration(c.Download.LongDelay)
             currentDownloads = 0
         }
