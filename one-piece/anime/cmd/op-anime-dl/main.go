@@ -21,7 +21,7 @@ func main() {
 	)
 
 	for true {
-		slog.Debug("Get anime list.", "url", a.GetUrl(anime.NameEpisodenStreams))
+		slog.Debug("Get anime list.", "url", a.GetUrl(anime.PathEpisodenStreams))
 		animeList, err = a.GetEpisodenStreams()
 		if err != nil {
 			slog.Error("Get anime list failed!", "err", err.Error())
@@ -29,29 +29,31 @@ func main() {
 			iterAnimeList(animeList)
 		}
 
-        for true {
-            now := time.Now()
-            next := time.Date(now.Year(), now.Month(), now.Day()+1, c.Update.Hour, 0, 0, 0, time.Local)
-            duration := next.Sub(now)
-            slog.Debug("Sleep until next update day.", "duration", duration)
-            time.Sleep(duration)
+		for true {
+			now := time.Now()
+			next := time.Date(now.Year(), now.Month(), now.Day()+1, c.Update.Hour, 0, 0, 0, time.Local)
+			duration := next.Sub(now)
+			slog.Debug("Sleep until next update day.", "duration", duration)
+			time.Sleep(duration)
 
-            if time.Now().Weekday() == c.Update.Weekday {
-                slog.Debug("Running new update now...")
-                break
-            }
-        }
+			if time.Now().Weekday() == c.Update.Weekday {
+				slog.Debug("Running new update now...")
+				break
+			}
+		}
 	}
 }
 
 func iterAnimeList(animeData *anime.Data) {
-    for _, entry := range animeData.Entries {
-		// TODO: file name `${chapterNumber}-${episodeName}`
-        fileName := fmt.Sprintf(
-            "%05d %s (sub: %s, dub: %s)",
-            entry.Number, entry.Name, entry.LangSub, entry.LangDub,
-        )
-        slog.Debug("Generate file name", "fileName", fileName)
+	for _, entry := range animeData.Entries {
+        arcName := animeData.Arcs.Get(entry.ArcID).Name
+		fileName := fmt.Sprintf(
+			"%04d %s (sub: %s, dub: %s)",
+			entry.Number, entry.Name, entry.LangSub, entry.LangDub,
+		)
+		slog.Debug("Generate file name",
+			"arcName", arcName,
+			"fileName", fileName)
 
 		// TODO: download chapter or skip if already exists
 		// TODO: download delay
@@ -112,26 +114,26 @@ func parseFlags(c *Config) {
 		c.Update.Hour = *hour
 	}
 
-    handlerOptions := &slog.HandlerOptions{
-        ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
-            if a.Key == "time" {
-                return slog.Attr{}
-            }
-            return a
-        },
-        Level: slog.LevelInfo,
-    }
+	handlerOptions := &slog.HandlerOptions{
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if a.Key == "time" {
+				return slog.Attr{}
+			}
+			return a
+		},
+		Level: slog.LevelInfo,
+	}
 
 	if c.Debug {
 		handlerOptions = &slog.HandlerOptions{
-            ReplaceAttr: handlerOptions.ReplaceAttr,
-            Level: slog.LevelDebug,
-        }
+			ReplaceAttr: handlerOptions.ReplaceAttr,
+			Level:       slog.LevelDebug,
+		}
 	}
 
-    slog.SetDefault(
-        slog.New(
-            slog.NewTextHandler(os.Stderr, handlerOptions),
-        ),
-    )
+	slog.SetDefault(
+		slog.New(
+			slog.NewTextHandler(os.Stderr, handlerOptions),
+		),
+	)
 }
