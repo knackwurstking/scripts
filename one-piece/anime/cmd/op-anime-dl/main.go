@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 	"time"
 
 	"op-anime-dl/internal/anime"
@@ -46,14 +47,10 @@ func main() {
 
 func iterAnimeList(animeData *anime.Data) {
 	for _, entry := range animeData.Entries {
-        arcName := animeData.Arcs.Get(entry.ArcID).Name
-		fileName := fmt.Sprintf(
-			"%04d %s (sub: %s, dub: %s)",
-			entry.Number, entry.Name, entry.LangSub, entry.LangDub,
-		)
-		slog.Debug("Generate file name",
-			"arcName", arcName,
-			"fileName", fileName)
+		arcName := animeData.Arcs.Get(entry.ArcID).Name
+		fileName := fmt.Sprintf("%04d %s (%s_SUB)",
+			entry.Number, entry.Name, strings.ToUpper(entry.LangSub))
+		slog.Debug("Generate file name", "arcName", arcName, "fileName", fileName)
 
 		// TODO: download chapter or skip if already exists
 		// TODO: download delay
