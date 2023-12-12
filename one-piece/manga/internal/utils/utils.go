@@ -28,6 +28,7 @@ func GetExtension(t string) (ext string, err error) {
 }
 
 func ConvertImagesToPDF(path string, images ...string) error {
+    slog.Debug("convert images to pdf", "dst", path)
 	images = append(images, "-quality", "100", "-density", "150", path+".pdf")
 
 	var stderr bytes.Buffer
