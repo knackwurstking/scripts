@@ -21,13 +21,13 @@ type Path string
 
 type Anime struct {
 	Origin string `json:"origin"`
-	Data   *Data  `json:"data"`
+	Data   *AnimeData  `json:"data"`
 }
 
-func New(origin string) *Anime {
+func NewAnime(origin string) *Anime {
 	return &Anime{
 		Origin: origin,
-		Data:   NewData(),
+		Data:   NewAnimeData(),
 	}
 }
 
@@ -40,7 +40,7 @@ func (anime *Anime) GetUrl(path Path) string {
 	}
 }
 
-func (anime *Anime) GetEpisodenStreams() (*Data, error) {
+func (anime *Anime) GetEpisodenStreams() (*AnimeData, error) {
 	var (
 		c   = colly.NewCollector()
 		err error
@@ -86,7 +86,7 @@ func (anime *Anime) GetEpisodenStreams() (*Data, error) {
 	return anime.Data, err
 }
 
-func (anime *Anime) Download(entry DataEntry, path string) error {
+func (anime *Anime) Download(entry AnimeDataEntry, path string) error {
 	var (
 		c   = colly.NewCollector()
 		err error
@@ -168,28 +168,21 @@ func (anime *Anime) downloadSource(src, dst string) error {
     return err
 }
 
-type Data struct {
-	Category DataCategory `json:"category"`
-	Arcs     DataArcs     `json:"arcs"`
-	Entries  []DataEntry  `json:"entries"`
+type AnimeData struct {
+	Arcs     AnimeDataArcs     `json:"arcs"`
+	Entries  []AnimeDataEntry  `json:"entries"`
 }
 
-func NewData() *Data {
-	return &Data{
-		Category: DataCategory{},
-		Arcs:     make([]DataArc, 0),
-		Entries:  make([]DataEntry, 0),
+func NewAnimeData() *AnimeData {
+	return &AnimeData{
+		Arcs:     make([]AnimeDataArc, 0),
+		Entries:  make([]AnimeDataEntry, 0),
 	}
 }
 
-type DataCategory struct {
-	ID   int    `json:"id"`
-	Type string `json:"type"` // NOTE: "anime"
-}
+type AnimeDataArcs []AnimeDataArc
 
-type DataArcs []DataArc
-
-func (arcs DataArcs) Get(id int) *DataArc {
+func (arcs AnimeDataArcs) Get(id int) *AnimeDataArc {
 	for i := 0; i < len(arcs); i++ {
 		if arcs[i].ID == id {
 			return &arcs[i]
@@ -200,7 +193,7 @@ func (arcs DataArcs) Get(id int) *DataArc {
 }
 
 // GetIndex in reversed order
-func (arcs DataArcs) GetIndex(id int) int {
+func (arcs AnimeDataArcs) GetIndex(id int) int {
 	for i := 0; i < len(arcs); i++ {
 		if arcs[i].ID == id {
 			return len(arcs) - 1 - i
@@ -210,18 +203,15 @@ func (arcs DataArcs) GetIndex(id int) int {
     panic(fmt.Sprintf("GetOrder failed for id \"%d\"", id))
 }
 
-type DataArc struct {
+type AnimeDataArc struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
-type DataEntry struct {
+type AnimeDataEntry struct {
 	Name        string `json:"name"`
 	Number      int    `json:"number"`
-	CategoryID  int    `json:"category_id"` // NOTE: only cateogory 1 "type: anime"
 	ArcID       int    `json:"arc_id"`
-	IsSpecial   bool   `json:"is_special"`
-	IsFiller    bool   `json:"is_filler"`
 	LangSub     string `json:"lang_sub"`
 	LangDub     string `json:"lang_dub"`
 	IsAvailable bool   `json:"is_available"`

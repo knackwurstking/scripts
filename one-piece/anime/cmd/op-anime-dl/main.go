@@ -21,7 +21,7 @@ func main() {
 	c = NewConfig()
 	parseFlags()
 
-    a = anime.New("https://onepiece-tube.com")
+    a = anime.NewAnime("https://onepiece-tube.com")
 
 	for true {
 		slog.Debug("Get anime list.", "url", a.GetUrl(anime.PathEpisodenStreams))
@@ -33,30 +33,6 @@ func main() {
 		}
 
         sleep()
-	}
-}
-
-func sleep() {
-	for true {
-		now := time.Now()
-
-		var day int
-		if now.Hour() < c.Update.Hour {
-			day = now.Day()
-		} else {
-			day = now.Day() + 1
-		}
-		next := time.Date(now.Year(), now.Month(), day, c.Update.Hour, 0, 0, 0, time.Local)
-
-		duration := next.Sub(now)
-		slog.Debug("Sleep until next update day.", "duration", duration)
-
-		time.Sleep(duration)
-
-		if time.Now().Weekday() == c.Update.Weekday {
-			slog.Debug("Running new update now...")
-			break
-		}
 	}
 }
 
@@ -102,6 +78,8 @@ func iterAnimeList() {
 	}
 }
 
+
+
 func mkdirAll(dirName string) {
 	path := filepath.Join(c.Download.Dst, dirName)
     _, err := os.Stat(path)
@@ -114,10 +92,34 @@ func mkdirAll(dirName string) {
 	}
 }
 
-func downloadEntry(path string, entry anime.DataEntry) {
+func downloadEntry(path string, entry anime.AnimeDataEntry) {
     if err := a.Download(entry, path); err != nil {
         slog.Error("Download error!", "err", err.Error())
     }
+}
+
+func sleep() {
+	for true {
+		now := time.Now()
+
+		var day int
+		if now.Hour() < c.Update.Hour {
+			day = now.Day()
+		} else {
+			day = now.Day() + 1
+		}
+		next := time.Date(now.Year(), now.Month(), day, c.Update.Hour, 0, 0, 0, time.Local)
+
+		duration := next.Sub(now)
+		slog.Debug("Sleep until next update day.", "duration", duration)
+
+		time.Sleep(duration)
+
+		if time.Now().Weekday() == c.Update.Weekday {
+			slog.Debug("Running new update now...")
+			break
+		}
+	}
 }
 
 func parseFlags() {
