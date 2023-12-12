@@ -30,17 +30,30 @@ func main() {
 			iterAnimeList(animeList)
 		}
 
-		for true {
-			now := time.Now()
-			next := time.Date(now.Year(), now.Month(), now.Day()+1, c.Update.Hour, 0, 0, 0, time.Local)
-			duration := next.Sub(now)
-			slog.Debug("Sleep until next update day.", "duration", duration)
-			time.Sleep(duration)
+        sleep(c)
+	}
+}
 
-			if time.Now().Weekday() == c.Update.Weekday {
-				slog.Debug("Running new update now...")
-				break
-			}
+func sleep(c *Config) {
+	for true {
+		now := time.Now()
+
+		var day int
+		if now.Hour() <= c.Update.Hour {
+			day = now.Day()
+		} else {
+			day = now.Day() + 1
+		}
+		next := time.Date(now.Year(), now.Month(), day, c.Update.Hour, 0, 0, 0, time.Local)
+
+		duration := next.Sub(now)
+		slog.Debug("Sleep until next update day.", "duration", duration)
+
+		time.Sleep(duration)
+
+		if time.Now().Weekday() == c.Update.Weekday {
+			slog.Debug("Running new update now...")
+			break
 		}
 	}
 }
@@ -53,6 +66,7 @@ func iterAnimeList(animeData *anime.Data) {
 		slog.Debug("Generate file name", "arcName", arcName, "fileName", fileName)
 
 		// TODO: download chapter or skip if already exists
+
 		// TODO: download delay
 	}
 }
