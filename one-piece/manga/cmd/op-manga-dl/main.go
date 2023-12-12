@@ -58,21 +58,26 @@ func downloadAllChapters() {
 		)
 
 		_, err := os.Stat(path + ".pdf")
-		if err != nil {
-			_ = os.MkdirAll(path, 0755)
+		if err == nil {
+            // File (pdf) already exists, continue to next chapter
+            continue
+        }
 
-            currentDownloads += 1
-			downloadChapter(chapter, path)
+        // Make directory where the pages will be stored (ignore errors if already exists)
+        _ = os.MkdirAll(path, 0755)
 
-            duration := time.Minute * time.Duration(c.Download.Delay)
-            if currentDownloads >= c.Download.LimitPerDay {
-                duration = time.Minute * time.Duration(c.Download.LongDelay)
-                currentDownloads = 0
-            }
+        currentDownloads += 1
+        downloadChapter(chapter, path)
 
-            slog.Debug("download delay", "duration", duration, "currentDownloads", currentDownloads)
-            time.Sleep(duration)
-		}
+        // Handle the short and long download delay based on limit
+        duration := time.Minute * time.Duration(c.Download.Delay)
+        if currentDownloads >= c.Download.LimitPerDay {
+            duration = time.Minute * time.Duration(c.Download.LongDelay)
+            currentDownloads = 0
+        }
+
+        slog.Debug("download delay", "duration", duration, "currentDownloads", currentDownloads)
+        time.Sleep(duration)
 	}
 }
 
