@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -27,7 +28,7 @@ func main() {
 		if err != nil {
 			slog.Error("Get anime list failed!", "err", err.Error())
 		} else {
-			iterAnimeList(animeList)
+			iterAnimeList(animeList, c)
 		}
 
         sleep(c)
@@ -58,7 +59,7 @@ func sleep(c *Config) {
 	}
 }
 
-func iterAnimeList(animeData *anime.Data) {
+func iterAnimeList(animeData *anime.Data, c *Config) {
 	for _, entry := range animeData.Entries {
         arc := animeData.Arcs.Get(entry.ArcID)
 
@@ -68,10 +69,33 @@ func iterAnimeList(animeData *anime.Data) {
 
 		//slog.Debug("Generate file name", "dirName", dirName, "fileName", fileName)
 
-		// TODO: download chapter or skip if already exists
+        path := filepath.Join(c.Download.Dst, dirName, fileName)
+        _, err := os.Stat(path)
+        if err != nil {
+            path := filepath.Join(c.Download.Dst, dirName)
+            _, err = os.Stat(path)
+            if err != nil {
+                slog.Debug("Create directories", "path", path)
+                err = os.MkdirAll(path, os.ModeDir|os.ModePerm)
+                if err != nil {
+                    panic(err)
+                }
+            }
+        } else {
+            slog.Debug("Chapter already exists! (continue)", "number", entry.Number)
+            continue
+        }
 
-		// TODO: download delay
+        downloadEntry(path, entry)
+
+        duration := c.Download.Delay.GetDuration()
+        slog.Debug("download delay", "duration", duration)
+        time.Sleep(duration)
 	}
+}
+
+func downloadEntry(path string, entry anime.DataEntry) {
+    // TODO: download episode and write to `path`
 }
 
 func parseFlags(c *Config) {
