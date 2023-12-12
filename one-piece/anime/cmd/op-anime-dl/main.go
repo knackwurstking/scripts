@@ -62,7 +62,6 @@ func iterAnimeList() {
         if err != nil {
             mkdirAll(dirName)
         } else {
-            slog.Debug("Chapter already exists! (continue)", "number", entry.Number)
             continue
         }
 
