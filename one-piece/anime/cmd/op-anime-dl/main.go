@@ -132,7 +132,7 @@ func parseFlags() {
 
 	flag.IntVar(
 		&c.Download.LongDelay,
-		"delay",
+		"long-delay",
 		c.Download.LongDelay,
 		"Set long delay in minutes if download limit was reached",
 	)
