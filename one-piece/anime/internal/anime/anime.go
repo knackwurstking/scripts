@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	NameEpisodenStreams Name = "episoden-streams"
+	PathEpisodenStreams Path = "/anime/episoden-streams"
 )
 
-type Name string
+type Path string
 
 type Anime struct {
 	Origin string `json:"origin"`
@@ -27,12 +27,12 @@ func New(origin string) *Anime {
 	}
 }
 
-func (anime *Anime) GetUrl(name Name) string {
-	switch name {
-	case NameEpisodenStreams:
-		return fmt.Sprintf("%s/anime/episoden-streams", anime.Origin) // TODO: check url
+func (anime *Anime) GetUrl(path Path) string {
+	switch path {
+	case PathEpisodenStreams:
+		return fmt.Sprintf("%s%s", anime.Origin, PathEpisodenStreams)
 	default:
-		panic(fmt.Sprintf("Name \"%s\" not found!", name))
+		panic(fmt.Sprintf("Name \"%s\" not found!", path))
 	}
 }
 
@@ -73,7 +73,7 @@ func (anime *Anime) GetEpisodenStreams() (*Data, error) {
 		}
 	})
 
-	if err = c.Visit(anime.GetUrl(NameEpisodenStreams)); err != nil {
+	if err = c.Visit(anime.GetUrl(PathEpisodenStreams)); err != nil {
 		return anime.Data, err
 	}
 
@@ -84,7 +84,7 @@ func (anime *Anime) GetEpisodenStreams() (*Data, error) {
 
 type Data struct {
 	Category DataCategory `json:"category"`
-	Arcs     []DataArc    `json:"arcs"`
+	Arcs     DataArcs     `json:"arcs"`
 	Entries  []DataEntry  `json:"entries"`
 }
 
@@ -101,10 +101,21 @@ type DataCategory struct {
 	Type string `json:"type"` // NOTE: "anime"
 }
 
+type DataArcs []DataArc
+
+func (arcs DataArcs) Get(id int) *DataArc {
+	for i := 0; i < len(arcs); i++ {
+		if arcs[i].ID == id {
+			return &arcs[i]
+		}
+	}
+
+	return nil
+}
+
 type DataArc struct {
+	ID   int    `json:"id"`
 	Name string `json:"name"`
-	Min  int    `json:"min"`
-	Max  int    `json:"max"`
 }
 
 type DataEntry struct {
