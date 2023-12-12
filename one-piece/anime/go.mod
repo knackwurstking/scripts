@@ -1,8 +1,13 @@
 module op-anime-dl
 
-go 1.20
+go 1.21
 
-require github.com/gocolly/colly/v2 v2.1.0
+toolchain go1.21.4
+
+require (
+	github.com/gocolly/colly/v2 v2.1.0
+	github.com/lmittmann/tint v1.0.3
+)
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1 // indirect

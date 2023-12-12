@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"op-anime-dl/internal/anime"
+
+	"github.com/lmittmann/tint"
 )
 
 var (
@@ -169,26 +171,14 @@ func parseFlags() {
 		c.Update.Hour = *hour
 	}
 
-	handlerOptions := &slog.HandlerOptions{
-		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
-			if a.Key == "time" {
-				return slog.Attr{}
-			}
-			return a
-		},
+    options := &tint.Options{
+        TimeFormat: time.Kitchen,
 		Level: slog.LevelInfo,
-	}
+    }
 
 	if c.Debug {
-		handlerOptions = &slog.HandlerOptions{
-			ReplaceAttr: handlerOptions.ReplaceAttr,
-			Level:       slog.LevelDebug,
-		}
+        options.Level = slog.LevelDebug
 	}
 
-	slog.SetDefault(
-		slog.New(
-			slog.NewTextHandler(os.Stderr, handlerOptions),
-		),
-	)
+    slog.SetDefault(slog.New(tint.NewHandler(os.Stderr, options)))
 }
