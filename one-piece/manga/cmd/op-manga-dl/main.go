@@ -197,7 +197,7 @@ func parseFlags() {
 	}
 
     options := &tint.Options{
-        TimeFormat: time.Kitchen,
+        TimeFormat: time.DateTime,
 		Level: slog.LevelInfo,
     }
 
