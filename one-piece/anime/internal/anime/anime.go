@@ -113,6 +113,17 @@ func (arcs DataArcs) Get(id int) *DataArc {
 	return nil
 }
 
+// GetIndex in reversed order
+func (arcs DataArcs) GetIndex(id int) int {
+	for i := 0; i < len(arcs); i++ {
+		if arcs[i].ID == id {
+			return len(arcs) - 1 - i
+		}
+	}
+
+    panic(fmt.Sprintf("GetOrder failed for id \"%d\"", id))
+}
+
 type DataArc struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`

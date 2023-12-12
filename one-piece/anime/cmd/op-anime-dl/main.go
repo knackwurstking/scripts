@@ -39,7 +39,7 @@ func sleep(c *Config) {
 		now := time.Now()
 
 		var day int
-		if now.Hour() <= c.Update.Hour {
+		if now.Hour() < c.Update.Hour {
 			day = now.Day()
 		} else {
 			day = now.Day() + 1
@@ -60,10 +60,13 @@ func sleep(c *Config) {
 
 func iterAnimeList(animeData *anime.Data) {
 	for _, entry := range animeData.Entries {
-		arcName := animeData.Arcs.Get(entry.ArcID).Name
+        arc := animeData.Arcs.Get(entry.ArcID)
+
 		fileName := fmt.Sprintf("%04d %s (%s_SUB)",
 			entry.Number, entry.Name, strings.ToUpper(entry.LangSub))
-		slog.Debug("Generate file name", "arcName", arcName, "fileName", fileName)
+        dirName := fmt.Sprintf("%03d %s", animeData.Arcs.GetIndex(arc.ID) + 1, arc.Name)
+
+		//slog.Debug("Generate file name", "dirName", dirName, "fileName", fileName)
 
 		// TODO: download chapter or skip if already exists
 
