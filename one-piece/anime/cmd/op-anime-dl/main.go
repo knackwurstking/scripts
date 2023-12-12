@@ -61,7 +61,16 @@ func sleep() {
 }
 
 func iterAnimeList() {
+    var (
+        currentDownloads = 0
+    )
+
 	for _, entry := range a.Data.Entries {
+        if entry.Href == "" {
+            slog.Debug("Skip entry (missing href attribute)", "entry.Number", entry.Number)
+            continue
+        }
+
         arc := a.Data.Arcs.Get(entry.ArcID)
 
 		fileName := fmt.Sprintf("%04d %s (%s_SUB).mp4",
@@ -79,10 +88,16 @@ func iterAnimeList() {
             continue
         }
 
+        currentDownloads += 1
         downloadEntry(path, entry)
 
         duration := c.Download.Delay.GetDuration()
-        slog.Debug("download delay", "duration", duration)
+        if c.Download.LimitPerDay >= currentDownloads {
+            duration = time.Hour * 24
+            currentDownloads = 0
+        }
+
+        slog.Debug("download delay", "duration", duration, "currentDownloads", currentDownloads)
         time.Sleep(duration)
 	}
 }
