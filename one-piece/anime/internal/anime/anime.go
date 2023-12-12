@@ -1,9 +1,13 @@
 package anime
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log/slog"
+	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gocolly/colly/v2"
@@ -73,13 +77,95 @@ func (anime *Anime) GetEpisodenStreams() (*Data, error) {
 		}
 	})
 
-	if err = c.Visit(anime.GetUrl(PathEpisodenStreams)); err != nil {
+    if err := c.Visit(anime.GetUrl(PathEpisodenStreams)); err != nil {
 		return anime.Data, err
 	}
 
 	c.Wait()
 
 	return anime.Data, err
+}
+
+func (anime *Anime) Download(entry DataEntry, path string) error {
+	var (
+		c   = colly.NewCollector()
+		err error
+	)
+
+	c.OnHTML("iframe", func(h *colly.HTMLElement) {
+        src := h.Attr("src")
+        c := colly.NewCollector()
+
+        c.OnHTML("video > source", func(h *colly.HTMLElement) {
+            src := h.Attr("src")
+
+            if h.Attr("type") != "video/mp4" {
+                slog.Warn("HTML tag <source has not type \"video/mp4\" attribute")
+                return
+            }
+
+            slog.Debug("Got url from video source", "src", src)
+            if err := anime.downloadSource(src, path); err != nil {
+                slog.Error("download src to dst failed", "err", err, "src", src, "dst", path)
+                _ = os.Remove(path)
+            }
+        })
+
+        c.OnRequest(func(r *colly.Request) {
+            slog.Debug(fmt.Sprintf("Request to \"%s\"", r.URL))
+        })
+
+        c.OnError(func(r *colly.Response, err error) {
+            slog.Error("Colly error", "err", err.Error())
+        })
+
+        if err := c.Visit(src); err != nil {
+            slog.Error(fmt.Sprintf("Visit \"%s\" failed!", src), "err", err.Error())
+        }
+
+        c.Wait()
+	})
+
+	c.OnRequest(func(r *colly.Request) {
+		slog.Debug(fmt.Sprintf("Request to \"%s\"", r.URL))
+	})
+
+	c.OnError(func(r *colly.Response, e error) {
+		if e != nil {
+			err = e
+		}
+	})
+
+    if err := c.Visit(entry.Href); err != nil {
+		return err
+	}
+
+	c.Wait()
+
+    return err
+}
+
+func (anime *Anime) downloadSource(src, dst string) error {
+    if _, err := os.Stat(dst); err == nil {
+        slog.Warn("file already exists", "dst", dst)
+        return nil
+    }
+
+    response, err := http.Get(src)
+    if err != nil {
+        return err
+    }
+    defer response.Body.Close()
+
+    file, err := os.Create(dst)
+    if err != nil {
+        return err
+    }
+
+    n, err := io.Copy(bufio.NewWriter(file), response.Body)
+    slog.Debug("io.Copy", "dst", dst, "written", n, "err", err)
+
+    return err
 }
 
 type Data struct {

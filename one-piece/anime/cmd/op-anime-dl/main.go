@@ -12,30 +12,31 @@ import (
 	"op-anime-dl/internal/anime"
 )
 
-func main() {
-	c := NewConfig()
-	parseFlags(c)
+var (
+    a *anime.Anime
+    c *Config
+)
 
-	var (
-		a         *anime.Anime = anime.New("https://onepiece-tube.com")
-		animeList *anime.Data
-		err       error
-	)
+func main() {
+	c = NewConfig()
+	parseFlags()
+
+    a = anime.New("https://onepiece-tube.com")
 
 	for true {
 		slog.Debug("Get anime list.", "url", a.GetUrl(anime.PathEpisodenStreams))
-		animeList, err = a.GetEpisodenStreams()
+        _, err := a.GetEpisodenStreams()
 		if err != nil {
 			slog.Error("Get anime list failed!", "err", err.Error())
 		} else {
-			iterAnimeList(animeList, c)
+			iterAnimeList()
 		}
 
-        sleep(c)
+        sleep()
 	}
 }
 
-func sleep(c *Config) {
+func sleep() {
 	for true {
 		now := time.Now()
 
@@ -59,28 +60,20 @@ func sleep(c *Config) {
 	}
 }
 
-func iterAnimeList(animeData *anime.Data, c *Config) {
-	for _, entry := range animeData.Entries {
-        arc := animeData.Arcs.Get(entry.ArcID)
+func iterAnimeList() {
+	for _, entry := range a.Data.Entries {
+        arc := a.Data.Arcs.Get(entry.ArcID)
 
-		fileName := fmt.Sprintf("%04d %s (%s_SUB)",
+		fileName := fmt.Sprintf("%04d %s (%s_SUB).mp4",
 			entry.Number, entry.Name, strings.ToUpper(entry.LangSub))
-        dirName := fmt.Sprintf("%03d %s", animeData.Arcs.GetIndex(arc.ID) + 1, arc.Name)
+        dirName := fmt.Sprintf("%03d %s", a.Data.Arcs.GetIndex(arc.ID) + 1, arc.Name)
 
 		//slog.Debug("Generate file name", "dirName", dirName, "fileName", fileName)
 
         path := filepath.Join(c.Download.Dst, dirName, fileName)
         _, err := os.Stat(path)
         if err != nil {
-            path := filepath.Join(c.Download.Dst, dirName)
-            _, err = os.Stat(path)
-            if err != nil {
-                slog.Debug("Create directories", "path", path)
-                err = os.MkdirAll(path, os.ModeDir|os.ModePerm)
-                if err != nil {
-                    panic(err)
-                }
-            }
+            mkdirAll(dirName)
         } else {
             slog.Debug("Chapter already exists! (continue)", "number", entry.Number)
             continue
@@ -94,13 +87,25 @@ func iterAnimeList(animeData *anime.Data, c *Config) {
 	}
 }
 
-func downloadEntry(path string, entry anime.DataEntry) {
-    // TODO: download episode and write to `path`
-    // 1. iter for iframes
-    //  - querySelect video > source and get attribute src= from source tag
+func mkdirAll(dirName string) {
+	path := filepath.Join(c.Download.Dst, dirName)
+    _, err := os.Stat(path)
+	if err != nil {
+		slog.Debug("Create directories", "path", path)
+		err = os.MkdirAll(path, os.ModeDir|os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
-func parseFlags(c *Config) {
+func downloadEntry(path string, entry anime.DataEntry) {
+    if err := a.Download(entry, path); err != nil {
+        slog.Error("Download error!", "err", err.Error())
+    }
+}
+
+func parseFlags() {
 	flag.BoolVar(&c.Debug, "debug", c.Debug, "Enable debugging")
 
 	flag.IntVar(
