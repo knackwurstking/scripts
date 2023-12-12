@@ -96,6 +96,8 @@ func iterAnimeList(animeData *anime.Data, c *Config) {
 
 func downloadEntry(path string, entry anime.DataEntry) {
     // TODO: download episode and write to `path`
+    // 1. iter for iframes
+    //  - querySelect video > source and get attribute src= from source tag
 }
 
 func parseFlags(c *Config) {
