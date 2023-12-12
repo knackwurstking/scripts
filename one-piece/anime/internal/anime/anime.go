@@ -4,89 +4,110 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"os"
 	"strings"
 
 	"github.com/gocolly/colly/v2"
 )
 
 const (
-    NameEpisodenStreams Name = "episoden-streams"
+	NameEpisodenStreams Name = "episoden-streams"
 )
 
 type Name string
 
 type Anime struct {
-	Origin string
-    Data *Data
+	Origin string `json:"origin"`
+	Data   *Data  `json:"data"`
 }
 
 func New(origin string) *Anime {
 	return &Anime{
 		Origin: origin,
-        Data: &Data{},
+		Data:   &Data{},
 	}
 }
 
 func (anime *Anime) GetUrl(name Name) string {
 	switch name {
-    case NameEpisodenStreams:
-        return fmt.Sprintf("%s/anime/episoden-streams", anime.Origin) // TODO: check url
+	case NameEpisodenStreams:
+		return fmt.Sprintf("%s/anime/episoden-streams", anime.Origin) // TODO: check url
 	default:
 		panic(fmt.Sprintf("Name \"%s\" not found!", name))
 	}
 }
 
 func (anime *Anime) GetEpisodenStreams() (*Data, error) {
-    anime.Data = nil // reset data first
+	anime.Data = nil // reset data first
 
-    var (
-        c = colly.NewCollector()
-        err error
-    )
+	var (
+		c   = colly.NewCollector()
+		err error
+	)
 
-    c.OnHTML("script", func(h *colly.HTMLElement) {
-        var (
-            dataVar = "window.__data"
-            text = strings.Trim(h.Text, " ")
-        )
+	c.OnHTML("script", func(h *colly.HTMLElement) {
+		var (
+			dataVar = "window.__data"
+			text    = strings.Trim(h.Text, " ")
+		)
 
-        if len(text) < len(dataVar) {
-            return
-        }
+		if len(text) < len(dataVar) {
+			return
+		}
 
-        if text[0:13] == dataVar {
-            text, _ = strings.CutPrefix(text, dataVar)
-            text = strings.TrimLeft(text, " =")
-            text = strings.TrimRight(text, "; ")
+		if text[0:13] == dataVar {
+			text, _ = strings.CutPrefix(text, dataVar)
+			text = strings.TrimLeft(text, " =")
+			text = strings.TrimRight(text, "; ")
 
-            if err := json.Unmarshal([]byte(text), anime.Data); err != nil {
-                slog.Error("Unmarshal data failed!", "err", err.Error())
-            }
-        }
-    })
+			if err := json.Unmarshal([]byte(text), anime.Data); err != nil {
+				slog.Error("Unmarshal data failed!", "err", err.Error())
+			}
+		}
+	})
 
-    c.OnRequest(func(r *colly.Request) {
-        slog.Debug(fmt.Sprintf("Request to \"%s\"", r.URL))
-    })
+	c.OnRequest(func(r *colly.Request) {
+		slog.Debug(fmt.Sprintf("Request to \"%s\"", r.URL))
+	})
 
-    c.OnError(func(r *colly.Response, e error) {
-        if e != nil {
-            err = e
-        }
-    })
+	c.OnError(func(r *colly.Response, e error) {
+		if e != nil {
+			err = e
+		}
+	})
 
-    if err = c.Visit(anime.GetUrl(NameEpisodenStreams)); err != nil {
-        return anime.Data, err 
-    }
+	if err = c.Visit(anime.GetUrl(NameEpisodenStreams)); err != nil {
+		return anime.Data, err
+	}
 
-    c.Wait()
+	c.Wait()
 
-	return anime.Data, err 
+	return anime.Data, err
 }
 
 type Data struct {
+	Options  DataOptions  `json:"options"`
+	Category DataCategory `json:"category"`
+	Specials DataSpecials `json:"specials"`
+	Arcs     DataArcs     `json:"arcs"`
+	Entries  DataEntries  `json:"entries"`
 }
 
-type Chapter struct {
+type DataOptions struct {
+}
+
+type DataCategory struct {
+}
+
+type DataSpecials struct {
+}
+
+type DataArcs struct {
+}
+
+type DataEntries []DataEntry
+
+// TODO: continue here ...
+type DataEntry struct {
+    ID int `json:"id"`
+    Name string `json:"name"`
 }
