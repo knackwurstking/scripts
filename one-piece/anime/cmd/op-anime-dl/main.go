@@ -97,7 +97,7 @@ func iterAnimeList() {
             currentDownloads = 0
         }
 
-        slog.Debug("download delay", "duration", duration, "currentDownloads", currentDownloads)
+        slog.Debug("Download delay", "duration", duration, "currentDownloads", currentDownloads)
         time.Sleep(duration)
 	}
 }
