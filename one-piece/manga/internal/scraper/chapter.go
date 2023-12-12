@@ -2,7 +2,8 @@ package scraper
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/gocolly/colly/v2"
@@ -40,13 +41,13 @@ func ParseChapter(chapterURL string) (data *ChapterData, err error) {
 			e.Text = strings.TrimRight(e.Text, "; ")
 
 			if err := json.Unmarshal([]byte(e.Text), data); err != nil {
-				log.Printf("[ERROR] %s\n", err)
+				slog.Error(err.Error())
 			}
 		}
 	})
 
 	c.OnRequest(func(r *colly.Request) {
-		log.Printf("[DEBUG] request to \"%s\"\n", r.URL)
+		slog.Debug(fmt.Sprintf("Request to \"%s\"", r.URL))
 	})
 
 	c.OnError(func(r *colly.Response, e error) {

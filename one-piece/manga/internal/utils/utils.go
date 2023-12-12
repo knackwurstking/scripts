@@ -3,7 +3,7 @@ package utils
 import (
 	"bytes"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"os/exec"
 )
@@ -36,7 +36,7 @@ func ConvertImagesToPDF(path string, images ...string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		log.Println("[DEBUG]", stderr.String())
+		slog.Debug("Convert images to PDF failed!", "err", err.Error(), "stderr", stderr.String())
 		_ = os.Remove(path + ".pdf")
 	}
 

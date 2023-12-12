@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 WorkingDirectory=/mnt/media/Data/.src/scripts/one-piece/manga/
-ExecStart=/mnt/media/Data/.src/scripts/one-piece/manga/op-manga-dl
+ExecStart=/mnt/media/Data/.src/scripts/one-piece/manga/op-manga-dl -debug -limit 2 -delay 30 -long-delay 180
 
 [Install]
 WantedBy=default.target
