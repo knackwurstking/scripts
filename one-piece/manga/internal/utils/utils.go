@@ -36,7 +36,7 @@ func ConvertImagesToPDF(path string, images ...string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		slog.Debug("Convert images to PDF failed!", "err", err.Error(), "stderr", stderr.String())
+		slog.Error("Convert images to PDF failed!", "err", err.Error(), "stderr", stderr.String())
 		_ = os.Remove(path + ".pdf")
 	}
 

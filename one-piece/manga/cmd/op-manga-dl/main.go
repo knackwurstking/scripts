@@ -29,7 +29,7 @@ func main() {
 }
 
 func downloadAllChapters() {
-	slog.Debug("download chapters")
+	slog.Debug("download all chapters")
 
 	ml, err := scraper.ParseMangaList()
 	if err != nil {
@@ -70,25 +70,25 @@ func downloadAllChapters() {
                 currentDownloads = 0
             }
 
-            slog.Debug("Download delay", "duration", duration, "currentDownloads", currentDownloads)
+            slog.Debug("download delay", "duration", duration, "currentDownloads", currentDownloads)
             time.Sleep(duration)
 		}
 	}
 }
 
 func downloadChapter(chapter scraper.MangaList_Chapter, path string) {
-	slog.Debug("Download pages", "chapter.Name", chapter.Name, "pages", chapter.Pages, "path", path)
+    slog.Info(fmt.Sprintf("Download chapter \"%s\" with %d pages.", chapter.Name, chapter.Pages))
 
 	// download jpg/png from dURL - scrape the same script section like before
 	chapterData, err := scraper.ParseChapter(chapter.Href)
 	if err != nil {
-		slog.Error("Parse chapter", "err", err.Error())
+		slog.Error("Parsing chapter failed!", "chapter.Href", chapter.Href, "err", err.Error())
 		return
 	}
 
 	pages := make([]string, len(chapterData.Chapter.Pages))
 	for i, page := range chapterData.Chapter.Pages {
-		slog.Debug("Downloading page", "page.Url", page.Url)
+		slog.Debug("downloading page", "page.Url", page.Url)
 		r, err := http.Get(page.Url)
 		if err != nil {
 			slog.Error("Downloading page failed!", "page", i+1, "err", err.Error())
@@ -131,12 +131,12 @@ func sleep() {
 		next := time.Date(now.Year(), now.Month(), day, c.Update.Hour, 0, 0, 0, time.Local)
 
 		duration := next.Sub(now)
-		slog.Debug("Sleep until next update day.", "duration", duration)
+		slog.Debug("sleep until next update day", "duration", duration)
 
 		time.Sleep(duration)
 
 		if time.Now().Weekday() == c.Update.Weekday {
-			slog.Debug("Running new update now...")
+			slog.Debug("running new update now...")
 			break
 		}
 	}
