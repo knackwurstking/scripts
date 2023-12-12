@@ -15,13 +15,13 @@ func main() {
 
 	var (
 		a         *anime.Anime = anime.New("https://onepiece-tube.com")
-		animeList []anime.Chapter
+		animeList *anime.Data
 		err       error
 	)
 
 	for true {
-		slog.Debug("Get anime list.", "url", a.GetUrl(anime.NameAnimeList))
-		animeList, err = a.GetAnimeList()
+		slog.Debug("Get anime list.", "url", a.GetUrl(anime.NameEpisodenStreams))
+		animeList, err = a.GetEpisodenStreams()
 		if err != nil {
 			slog.Error("Get anime list failed!", "err", err.Error())
 		} else {
@@ -43,13 +43,13 @@ func main() {
 	}
 }
 
-func iterAnimeList(animeList []anime.Chapter) {
-	//for _, chapter := range animeList {
-	//	// TODO: file name `${chapterNumber}-${episodeName}`
-	//	fileName := fmt.Sprintf("")
+func iterAnimeList(animeList *anime.Data) {
+	//for _, _ = range animeList {
+		// TODO: file name `${chapterNumber}-${episodeName}`
+        //fileName := fmt.Sprintf("")
 
-	//	// TODO: download chapter or skip if already exists
-	//	// TODO: download delay
+		// TODO: download chapter or skip if already exists
+		// TODO: download delay
 	//}
 }
 
