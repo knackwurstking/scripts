@@ -74,7 +74,7 @@ func ParseMangaList() (data *MangaList, err error) {
 	})
 
 	c.OnRequest(func(r *colly.Request) {
-		slog.Debug(fmt.Sprintf("request to \"%s\"", r.URL))
+		slog.Debug(fmt.Sprintf("Request to \"%s\"", r.URL))
 	})
 
 	c.OnError(func(r *colly.Response, e error) {
