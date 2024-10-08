@@ -80,13 +80,24 @@ func runBackup() {
 	cwd := filepath.Dir(src)
 	base := filepath.Base(src)
 
-	out := filepath.Join(
-		dst,
-		fmt.Sprintf(
-			"%s-%d-%02d-%02d.tar.gz",
-			base, date.Year(), date.Month(), date.Day(),
-		),
-	)
+	var out string
+	if base == "" {
+		out = filepath.Join(
+			dst,
+			fmt.Sprintf(
+				"%d-%02d-%02d.tar.gz",
+				date.Year(), date.Month(), date.Day(),
+			),
+		)
+	} else {
+		out = filepath.Join(
+			dst,
+			fmt.Sprintf(
+				"%s-%d-%02d-%02d.tar.gz",
+				base, date.Year(), date.Month(), date.Day(),
+			),
+		)
+	}
 
 	session := sh.NewSession()
 
